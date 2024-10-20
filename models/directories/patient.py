@@ -33,6 +33,16 @@ class PatientTable(Base):
             "breed_name": self.breed.name,
         }
 
+    def to_dict_fast_search(self):
+        return {
+            "id": self.id,
+            "nickname": self.nickname,
+            "animal_type_name": self.animal_type.name,
+            "breed_name": self.breed.name,
+            "date_birth": self.date_birth,
+            "owner_fullname": self.owner.name + " " + self.owner.last_name + " " + self.owner.patronymic,
+        }
+
     def to_dict(self):
         return {
             "id": self.id,

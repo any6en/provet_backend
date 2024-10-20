@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Date, DateTime, CheckConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from models.model import Base
 
-class User(Base):
+class UserTable(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, autoincrement=True)
     login = Column(String(50), nullable=False, unique=True)

@@ -17,8 +17,8 @@ async def get_db():
         yield session
 
 @worker.get("/patients", description="Получение списка пациентов")
-async def get_route(id: int = None, db: AsyncSession = Depends(get_db)):
-    records = await get_patients(db, id)
+async def get_route(id: int = None, owner_id: int = None, db: AsyncSession = Depends(get_db)):
+    records = await get_patients(db, id, owner_id)
     if records is None:
         return create_http_response(Http400({"error": "Такой записи не существует"}))
 

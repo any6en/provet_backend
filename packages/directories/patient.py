@@ -9,7 +9,29 @@ from models.directories.patient import PatientTable
 from schemas.directories.patient import PatientInsertAttributes, PatientUpdateAttributes
 
 
-async def get_patients(db: AsyncSession, id: int = None):
+async def get_patients(db: AsyncSession, id: int = None, owner_id: int = None):
+    if owner_id is not None:
+        query = await db.execute(
+            select(PatientTable).options(selectinload(PatientTable.animal_type)).options(
+                selectinload(PatientTable.breed)).filter_by(owner_id=owner_id)
+        )
+        rows = query.scalars().all()
+
+        result = []
+        for row in rows:
+            dict = row.to_dict_page()
+
+            date_birth = dict.get('date_birth')
+            if date_birth is not None:
+                dict['date_birth'] = date_birth.isoformat()
+
+            created_at = dict.get('created_at')
+            if created_at is not None:
+                dict['created_at'] = created_at.isoformat()
+
+            result.append(dict)
+        return result
+
     if id is None:
         query = await db.execute(
             select(PatientTable).options(selectinload(PatientTable.animal_type)).options(selectinload(PatientTable.breed))
@@ -32,7 +54,7 @@ async def get_patients(db: AsyncSession, id: int = None):
         return result
 
     query = await db.execute(
-        select(PatientTable).options(selectinload(PatientTable.animal_type)).options(selectinload(PatientTable.breed))
+        select(PatientTable).options(selectinload(PatientTable.animal_type)).options(selectinload(PatientTable.breed)).filter_by(id=id)
     )
     result = query.scalars().first()
 

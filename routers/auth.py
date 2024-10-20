@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import AsyncSessionLocal
-from models.user import User
+from models.user import UserTable
 from schemas.user import LoginRequest
 from fastapi.responses import JSONResponse
 
@@ -29,7 +29,7 @@ async def login(login_request: LoginRequest, db: AsyncSession = Depends(get_db))
             content={"response": {"error": "Укажите логин и пароль"}}
         )
 
-    result = await db.execute(select(User).where(User.login == login_request.login, User.password == login_request.password))
+    result = await db.execute(select(UserTable).where(UserTable.login == login_request.login, UserTable.password == login_request.password))
     user = result.scalars().first()
 
     # Если пользователь не найден, возвращаем ошибку
