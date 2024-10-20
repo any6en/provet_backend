@@ -1,7 +1,7 @@
-from sqlalchemy import select, insert, update, text
+from sqlalchemy import select, insert, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from models.animal_type import AnimalTypeTable
-from schemas.animal_type import AnimalTypeInsertAttributes, AnimalTypeUpdateAttributes
+from models.directories.animal_type import AnimalTypeTable
+from schemas.directories.animal_type import AnimalTypeInsertAttributes, AnimalTypeUpdateAttributes
 
 
 async def get_animal_types(db: AsyncSession, id: int = None):

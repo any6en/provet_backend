@@ -2,10 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from routers import ping
-from routers import owner
-from routers import animal_type
-from routers import breed
-from routers import patient
+from routers.directories import owner, animal_type, breed, patient
+from routers import fast_search
 
 from utils.utils import global_exception_handling, unicorn_exception_handler
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -18,6 +16,7 @@ app.include_router(owner.worker, prefix=f'/api/directories', tags=["owners"])
 app.include_router(animal_type.worker, prefix=f'/api/directories', tags=["animal_types"])
 app.include_router(breed.worker, prefix=f'/api/directories', tags=["breeds"])
 app.include_router(patient.worker, prefix=f'/api/directories', tags=["patients"])
+app.include_router(fast_search.worker, prefix=f'/api/', tags=["fast_search"])
 
 
 # Обработка HTTPException в контроллерах.

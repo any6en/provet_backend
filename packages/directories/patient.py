@@ -4,10 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-from sqlalchemy.testing.plugin.plugin_base import logging
 
-from models.patient import PatientTable
-from schemas.patient import PatientInsertAttributes, PatientUpdateAttributes
+from models.directories.patient import PatientTable
+from schemas.directories.patient import PatientInsertAttributes, PatientUpdateAttributes
 
 
 async def get_patients(db: AsyncSession, id: int = None):

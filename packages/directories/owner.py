@@ -1,10 +1,9 @@
-import logging
 from datetime import datetime
 
-from sqlalchemy import select, insert, delete, update, text
+from sqlalchemy import select, insert, update, text
 from sqlalchemy.ext.asyncio import AsyncSession
-from models.owner import OwnerTable
-from schemas.owner import OwnerInsertAttributes, OwnerUpdateAttributes
+from models.directories.owner import OwnerTable
+from schemas.directories.owner import OwnerInsertAttributes, OwnerUpdateAttributes
 
 
 async def get_owners(db: AsyncSession, id: int = None):

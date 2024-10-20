@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import logging
 from database import AsyncSessionLocal
-from schemas.owner import OwnerInsertAttributes, OwnerUpdateAttributes
+from packages.directories.breed import get_breeds, create_breed, delete_breed, update_breed
+from schemas.directories.breed import BreedInsertAttributes, BreedUpdateAttributes
 from utils.responses import create_http_response, Http200, Http400
-from packages.owner import get_owners, create_owner, delete_owner, update_owner
 
-# Роутер для владельцев
+# Роутер
 worker = APIRouter()
 
 
@@ -16,9 +15,10 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-@worker.get("/owners", description="Получение списка владельцев")
+
+@worker.get("/breeds", description="Получение списка записей")
 async def get_route(id: int = None, db: AsyncSession = Depends(get_db)):
-    records = await get_owners(db, id)
+    records = await get_breeds(db, id)
     if records is None:
         return create_http_response(Http400({"error": "Такой записи не существует"}))
 
@@ -27,26 +27,28 @@ async def get_route(id: int = None, db: AsyncSession = Depends(get_db)):
 
     return create_http_response(Http200(records))
 
-@worker.post("/owners/owner", description="Создание нового владельца")
-async def create_route(record: OwnerInsertAttributes, db: AsyncSession = Depends(get_db)):
+
+@worker.post("/breeds/breed", description="Создание записи")
+async def post_route(record: BreedInsertAttributes, db: AsyncSession = Depends(get_db)):
     try:
-        new_record = await create_owner(record, db)
+        new_record = await create_breed(record, db)
         return create_http_response(Http200(new_record))
     except Exception as e:
-        logging.error(e.args)
         return create_http_response(Http400(e.args))
 
-@worker.delete("/owners/owner/{id}", description="Удаление владельца по переданному Id")
+
+@worker.delete("/breeds/breed/{id}", description="Удаление записи по переданному Id")
 async def delete_route(id: int, db: AsyncSession = Depends(get_db)):
-    deleted_record = await delete_owner(id, db)
-    if deleted_record is None:
+    record = await delete_breed(id, db)
+    if record is None:
         return create_http_response(Http400({"error": "Такой записи не существует"}))
 
-    return create_http_response(Http200(deleted_record))
+    return create_http_response(Http200(record))
 
-@worker.patch("/owners/owner", description="Обновить информацию в записи")
-async def update_route(record: OwnerUpdateAttributes, db: AsyncSession = Depends(get_db)):
-    updated_record = await update_owner(record, db)
+
+@worker.patch("/breeds/breed", description="Обновить запись по переданному Id")
+async def update_route(record: BreedUpdateAttributes, db: AsyncSession = Depends(get_db)):
+    updated_record = await update_breed(record, db)
     if updated_record is None:
         return create_http_response(Http400({"error": "Такой записи не существует"}))
 

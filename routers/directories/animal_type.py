@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import AsyncSessionLocal
-from schemas.animal_type import AnimalTypeInsertAttributes, AnimalTypeUpdateAttributes
+from schemas.directories.animal_type import AnimalTypeInsertAttributes, AnimalTypeUpdateAttributes
 from utils.responses import create_http_response, Http200, Http400
-from packages.animal_type import get_animal_types, create_animal_type, delete_animal_type, update_animal_type
+from packages.directories.animal_type import get_animal_types, create_animal_type, delete_animal_type, update_animal_type
 
 # Роутер
 worker = APIRouter()

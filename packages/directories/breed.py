@@ -1,12 +1,10 @@
-import logging
-
 from fastapi import HTTPException
-from sqlalchemy import select, insert, update
+from sqlalchemy import insert, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.breed import BreedTable
-from schemas.breed import BreedUpdateAttributes, BreedInsertAttributes
+from models.directories.breed import BreedTable
+from schemas.directories.breed import BreedUpdateAttributes, BreedInsertAttributes
 
 
 from sqlalchemy.future import select
