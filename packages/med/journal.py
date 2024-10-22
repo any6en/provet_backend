@@ -1,47 +1,54 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
-import logging
-
-from models.med.primary_visits import PrimaryVisit
-from models.med.vaccination_act import VaccinationAct
-from models.user import UserTable
+from sqlalchemy import text
 
 
-async def get_journal(db: AsyncSession, id: int = None):
-    # Запрос объединяет вакцины и первичные визиты и сортирует по дате
-    query = await db.execute(
-        select(VaccinationAct, PrimaryVisit)
-        .options(selectinload(VaccinationAct.user))
-        .options(selectinload(PrimaryVisit.user))
-        .outerjoin(PrimaryVisit, VaccinationAct.patient_id == VaccinationAct.patient_id)
-        .order_by(VaccinationAct.vaccination_date.desc())  # Сортируем по дате вакцинации в порядке убывания
+async def get_journal(db: AsyncSession, owner_id: int = None):
+    query_rows = text("""
+        SELECT 
+            primary_visits.id AS id, 
+            primary_visits.date_visit AS date, 
+            'Первичный прием' AS content,
+            users.last_name AS doctor
+        FROM provet.primary_visits 
+        JOIN provet.users ON primary_visits.user_id = users.id
+        WHERE primary_visits.owner_id = :owner_id 
+
+        UNION ALL 
+
+        SELECT 
+            vaccination_acts.id AS id, 
+            vaccination_acts.vaccination_date AS date, 
+            'Акт вакцинации' AS content,
+            users.last_name AS doctor
+        FROM provet.vaccination_acts 
+        JOIN provet.users ON vaccination_acts.user_id = users.id
+        WHERE vaccination_acts.owner_id = :owner_id
+
+        UNION ALL
+
+        SELECT 
+            repeat_visits.id AS id, 
+            repeat_visits.date_visit AS date, 
+            'Повторный прием' AS content, 
+            users.last_name AS doctor
+        FROM provet.repeat_visits 
+        JOIN provet.users ON repeat_visits.user_id = users.id
+        WHERE repeat_visits.owner_id = :owner_id 
+
+        ORDER BY date;
+    """)
+
+    result_rows = await db.execute(
+        query_rows, {'owner_id': owner_id}
     )
-    logging.error(str(
-        select(VaccinationAct, PrimaryVisit).filter_by(VaccinationAct.patient_id == id).filter_by(PrimaryVisit.patient_id == id)));
-    results = query.all()
+    rows = result_rows.all()
     result = []
+    for row in rows:
+        dict = row._asdict()
 
-    # Формируем результат из обеих таблиц
-    for vaccination_act, primary_visit in results:
-        # Добавляем данные о вакцинации
-        if vaccination_act:
-            result.append({
-                "id": vaccination_act.id,
-                "date": vaccination_act.vaccination_date.isoformat(),  # Предполагаем, что есть поле date в VaccinationAct
-                "year": vaccination_act.vaccination_date.isoformat() if vaccination_act.vaccination_date else None,
-                "content": "Акт вакцинации",
-                "doctor": vaccination_act.user.first_name  # Или аналогичное поле
-            })
+        date = dict.get('date')
+        if date is not None:
+            dict['date'] = date.isoformat()
 
-        # Если также нужно добавить данные из PrimaryVisit
-        if primary_visit:
-            result.append({
-                "id": primary_visit.id,
-                "date": primary_visit.date_visit.isoformat(),  # Предполагаем, что есть поле date_visit в PrimaryVisit
-                "year": primary_visit.date_visit.isoformat() if primary_visit.date_visit else None,
-                "content": "Первичный прием",
-                "doctor": primary_visit.user.first_name  # Или аналогичное поле
-            })
-
+        result.append(dict)
     return result

@@ -1,5 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, CheckConstraint
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String
 from models.model import Base
 
 class UserTable(Base):

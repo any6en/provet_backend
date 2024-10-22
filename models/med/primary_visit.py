@@ -2,8 +2,7 @@ from sqlalchemy import Column, Integer, Date, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from models.model import Base
 
-
-class PrimaryVisit(Base):
+class PrimaryVisitTable(Base):
     __tablename__ = "primary_visits"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -19,6 +18,21 @@ class PrimaryVisit(Base):
     date_visit = Column(DateTime, nullable=False)  # Дата посещения
 
     # Опциональные связи (если нужно)
-    user = relationship("UserTable")  # Предполагая, что у вас есть модель User
-    owner = relationship("OwnerTable")  # Предполагая, что у вас есть модель Owner
-    patient = relationship("PatientTable")  # Предполагая, что у вас есть модель Patient
+    # user = relationship("UserTable")
+    # owner = relationship("OwnerTable")
+    # patient = relationship("PatientTable")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'owner_id': self.owner_id,
+            'patient_id': self.patient_id,
+            'disease_onset_date': self.disease_onset_date.isoformat() if self.disease_onset_date else None,
+            'anamnesis': self.anamnesis,
+            'examination': self.examination,
+            'prelim_diagnosis': self.prelim_diagnosis,
+            'confirmed_diagnosis': self.confirmed_diagnosis,
+            'result': self.result,
+            'date_visit': self.date_visit.isoformat() if self.date_visit else None
+        }
