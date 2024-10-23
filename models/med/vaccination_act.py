@@ -13,8 +13,10 @@ class VaccinationAct(Base):
     vaccine = Column(String(255), nullable=False)  # Вакцина
     vaccination_date = Column(Date, nullable=False)  # Дата вакцинации
     revaccination_date = Column(Date, nullable=True)  # Дата ревакцинации
+    weight_id = Column(Integer, ForeignKey('weights.id'), nullable=True)
 
     # Опциональные связи (если нужно)
     user = relationship("UserTable")  # Предполагая, что у вас есть модель User
     owner = relationship("OwnerTable")  # Предполагая, что у вас есть модель Owner
+    weight = relationship("WeightTable")
     patient = relationship("PatientTable")  # Предполагая, что у вас есть модель Patient

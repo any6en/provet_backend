@@ -28,13 +28,11 @@ async def get_primary_visits(db: AsyncSession, id: int = None):
         return result
 
     query = await db.execute(
-        select(PrimaryVisitTable)
+        select(PrimaryVisitTable).filter_by(id=id)
     )
     result = query.scalars().first()
 
     dict = result.to_dict()
-
-
 
     return dict if result else None
 

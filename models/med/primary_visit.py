@@ -16,11 +16,13 @@ class PrimaryVisitTable(Base):
     confirmed_diagnosis = Column(Text, nullable=False)  # Подтвержденный диагноз
     result = Column(Text, nullable=False)  # Результат
     date_visit = Column(DateTime, nullable=False)  # Дата посещения
+    weight_id = Column(Integer, ForeignKey('weights.id'), nullable=True)
 
     # Опциональные связи (если нужно)
     # user = relationship("UserTable")
     # owner = relationship("OwnerTable")
     # patient = relationship("PatientTable")
+    # weight = relationship("WeightTable")
 
     def to_dict(self):
         return {

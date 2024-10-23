@@ -17,9 +17,11 @@ class RepeatVisitTable(Base):
     confirmed_diagnosis = Column(Text, nullable=False)  # Подтвержденный диагноз
     result = Column(Text, nullable=False)  # Результат
     date_visit = Column(DateTime, nullable=False)  # Дата посещения
+    weight_id = Column(Integer, ForeignKey('weights.id'), nullable=True)
 
     # Опциональные связи
     user = relationship("UserTable")  # Связь с врачом
     owner = relationship("OwnerTable")  # Связь с владельцем
     patient = relationship("PatientTable")  # Связь с пациентом
+    weight = relationship("WeightTable")
     primary_visit = relationship("PrimaryVisit")  # Связь с первичным посещением

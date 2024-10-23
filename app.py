@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from routers import ping
-from routers.directories import owner, animal_type, breed, patient, primary_visit
+from routers.directories import owner, animal_type, breed, patient, primary_visit, user
 from routers.med import journal
 
 from utils.utils import global_exception_handling, unicorn_exception_handler
@@ -12,6 +12,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 app = FastAPI(title="Provet Backend Server")
 
 app.include_router(ping.worker, prefix=f'/api/directories', tags=["ping"])
+app.include_router(user.worker, prefix=f'/api/directories', tags=["users"])
 app.include_router(owner.worker, prefix=f'/api/directories', tags=["owners"])
 app.include_router(animal_type.worker, prefix=f'/api/directories', tags=["animal_types"])
 app.include_router(breed.worker, prefix=f'/api/directories', tags=["breeds"])
