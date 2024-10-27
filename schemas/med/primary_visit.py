@@ -1,3 +1,5 @@
+import decimal
+from decimal import Decimal
 from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel, Field, root_validator
@@ -15,6 +17,7 @@ class PrimaryVisitInsertAttributes(BaseModel):
     confirmed_diagnosis: str = Field(..., description="Подтвержденный диагноз")
     result: str = Field(..., description="Результат")
     date_visit: Optional[datetime] = Field(default_factory=datetime.now, description="Дата посещения (по умолчанию текущее время)")
+    weight: Optional[Decimal] = Field(None, description="вес (тип DECIMAL(10, 2))")
 
     @root_validator(pre=True)
     def validate_ids(cls, values):
@@ -57,6 +60,7 @@ class PrimaryVisitUpdateAttributes(BaseModel):
     confirmed_diagnosis: Optional[str] = Field(None, description="Подтвержденный диагноз")
     result: Optional[str] = Field(None, description="Результат")
     date_visit: Optional[datetime] = Field(None, description="Дата посещения (по умолчанию текущее время)")
+    weight: Optional[Decimal] = Field(None, description="вес (тип DECIMAL(10, 2))")
 
     @root_validator(pre=True)
     def pre_validator(cls, values):

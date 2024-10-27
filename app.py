@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers import ping
 from routers.directories import owner, animal_type, breed, patient, primary_visit, user
 from routers.med import journal
+from routers import document_generator
 
 from utils.utils import global_exception_handling, unicorn_exception_handler
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -21,6 +22,7 @@ app.include_router(primary_visit.worker, prefix=f'/api/directories', tags=["prim
 
 
 app.include_router(journal.worker, prefix=f'/api', tags=["journal"])
+app.include_router(document_generator.worker, prefix=f'/api', tags=["document_generator"])
 
 
 # Обработка HTTPException в контроллерах.

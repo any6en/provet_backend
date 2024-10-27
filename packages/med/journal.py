@@ -2,6 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 import logging
 
+from utils.utils import calculate_age
+
 
 async def get_journal(db: AsyncSession, owner_id: int = None):
     query_rows = text("""
@@ -58,7 +60,6 @@ async def get_journal(db: AsyncSession, owner_id: int = None):
     primary_visits = []
 
     for row in rows:
-        logging.info(row)
         dict_row = row._asdict()
 
         # Преобразуем дату в ISO формат
@@ -81,54 +82,68 @@ async def get_journal(db: AsyncSession, owner_id: int = None):
 
     return primary_visits
 
-from datetime import datetime
-
-
+# Для отображения таблицы с приемами
 async def get_journal_visits(db: AsyncSession, primary_visit_id: int = None):
     query_rows = text("""
         SELECT 
             pv.id AS id, 
-            pv.date_visit AS date, 
+            pv.date_visit, 
             pv.user_id, 
             pv.owner_id, 
             pv.patient_id, 
-            at.name AS animal_name,  
-            b.name AS breed_name,     
-            p.nickname AS nickname,    
+            pv.weight,
+            p.animal_type_id as animal_type_id,
+            pv.anamnesis,
+            pv.examination, 
+            pv.prelim_diagnosis,
+            pv.confirmed_diagnosis,
+            pv.result, 
+            pv.disease_onset_date,
+            at.name AS animal_name,
+            b.name AS breed_name,
+            p.nickname AS nickname,
             p.date_birth AS date_birth,
-            w.value AS weight,       -- Получаем вес для первичного приема
             'Первичный прием' AS content,
-            NULL AS primary_visit_id  
+            NULL AS primary_visit_id,
+            CONCAT(o.first_name, ' ', o.patronymic, ' ', o.last_name) AS owner_full_name
         FROM provet.primary_visits pv
         JOIN provet.patients p ON pv.patient_id = p.id  
         LEFT JOIN provet.animal_types at ON p.animal_type_id = at.id  
-        LEFT JOIN provet.breeds b ON p.breed_id = b.id  
-        LEFT JOIN provet.weights w ON w.id = pv.weight_id  -- Присоединяем таблицу weights по weight_id
+        LEFT JOIN provet.breeds b ON p.breed_id = b.id
+        JOIN provet.owners o ON pv.owner_id = o.id  -- Объединение с таблицей owners
         WHERE pv.id = :primary_visit_id 
 
         UNION ALL 
 
         SELECT 
             rv.id AS id, 
-            rv.date_visit AS date,
+            rv.date_visit,
             rv.user_id, 
             rv.owner_id, 
-            rv.patient_id,  
+            rv.patient_id,
+            rv.weight, 
+            p.animal_type_id as animal_type_id,
+            rv.anamnesis,
+            rv.examination,
+            rv.prelim_diagnosis,
+            rv.disease_onset_date,
+            rv.confirmed_diagnosis, 
+            rv.result, 
             at.name AS animal_name,  
             b.name AS breed_name,     
             p.nickname AS nickname,    
             p.date_birth AS date_birth,
-            w.value AS weight,       -- Получаем вес для повторного приема
             'Повторный прием' AS content, 
-            rv.primary_visit_id AS primary_visit_id  
+            rv.primary_visit_id AS primary_visit_id,
+            CONCAT(o.first_name, ' ', o.patronymic, ' ', o.last_name) AS owner_full_name
         FROM provet.repeat_visits rv
         JOIN provet.patients p ON rv.patient_id = p.id  
         LEFT JOIN provet.animal_types at ON p.animal_type_id = at.id  
         LEFT JOIN provet.breeds b ON p.breed_id = b.id  
-        LEFT JOIN provet.weights w ON w.id = rv.weight_id  -- Используем weight_id для повторного приема
+        JOIN provet.owners o ON rv.owner_id = o.id  -- Объединение с таблицей owners
         WHERE rv.primary_visit_id = :primary_visit_id 
 
-        ORDER BY date;
+        ORDER BY date_visit;
     """)
 
     result_rows = await db.execute(query_rows, {'primary_visit_id': primary_visit_id})
@@ -139,22 +154,26 @@ async def get_journal_visits(db: AsyncSession, primary_visit_id: int = None):
 
     for row in rows:
         dict_row = row._asdict()
-
-        # Преобразуем дату в ISO формат
-        date = dict_row.get('date')
-        if date is not None:
-            dict_row['date'] = date.isoformat()
-
-        date_birth = dict_row.get('date_birth')
-        if date_birth is not None:
-            # Вычисление возраста
-            age = calculate_age(dict_row['date'], date_birth)
-            dict_row['age'] = age
-        del dict_row['date_birth']
+        logging.error(dict_row)
+        logging.error(row)
 
         # Преобразуем вес в float
         if dict_row.get('weight') is not None:
             dict_row['weight'] = float(dict_row['weight'])
+
+        # Преобразуем дату в ISO формат
+        date_visit = dict_row.get('date_visit')
+        if date_visit is not None:
+            dict_row['date_visit'] = date_visit.isoformat()
+
+
+
+        date_birth = dict_row.get('date_birth')
+        if date_birth is not None:
+            # Вычисление возраста
+            age = calculate_age(dict_row['date_visit'], date_birth)
+            dict_row['age'] = age
+        del dict_row['date_birth']
 
         if dict_row['primary_visit_id'] is None:
             # Если это первичный прием
@@ -162,6 +181,7 @@ async def get_journal_visits(db: AsyncSession, primary_visit_id: int = None):
             result_map[dict_row['id']] = dict_row
         else:
             # Это повторный прием
+
             if dict_row['primary_visit_id'] in result_map:
                 result_map[dict_row['primary_visit_id']]['subRows'].append(dict_row)
 
@@ -170,37 +190,3 @@ async def get_journal_visits(db: AsyncSession, primary_visit_id: int = None):
 
     # Возвращаем результат в нужном формате
     return primary_visit if primary_visit else None
-
-def calculate_age(date_visit, date_birth):
-    """
-    Calculate the age from date_birth to date_visit.
-    Returns a string in the format 'Xг Yм Zд'.
-    """
-    # Вытаскиваем дату посещения и дату рождения как объекты datetime
-    if isinstance(date_visit, str):
-        visit_date = datetime.fromisoformat(date_visit)
-    else:
-        visit_date = date_visit
-
-    if isinstance(date_birth, str):
-        birth_date = datetime.fromisoformat(date_birth)
-    else:
-        birth_date = date_birth
-
-    # Вычисление разницы
-    years = visit_date.year - birth_date.year
-    months = visit_date.month - birth_date.month
-    days = visit_date.day - birth_date.day
-
-    # Коррекция при отрицательных значениях
-    if days < 0:
-        months -= 1
-        last_month = (visit_date.month - 1) if visit_date.month > 1 else 12
-        days += (birth_date.replace(year=birth_date.year + (1 if last_month == 12 else 0),
-                                    month=last_month) - birth_date).days
-
-    if months < 0:
-        years -= 1
-        months += 12
-
-    return f"{years}г {months}м {days}д"

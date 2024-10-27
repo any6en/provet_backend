@@ -3,8 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 import logging
 from database import AsyncSessionLocal
-from packages.directories.primary_visit import get_primary_visits
-from schemas.directories.patient import PatientInsertAttributes, PatientUpdateAttributes
+from packages.directories.primary_visit import get_primary_visits, create_primary_visit, delete_primary_visit, \
+    update_primary_visit
+from schemas.med.primary_visit import PrimaryVisitUpdateAttributes, PrimaryVisitInsertAttributes
 from utils.responses import create_http_response, Http200, Http400
 
 worker = APIRouter()
@@ -26,7 +27,7 @@ async def get_route(id: int = None, db: AsyncSession = Depends(get_db)):
     return create_http_response(Http200(records))
 
 @worker.post("/primary_visits/primary_visit", description="Создание новой записи")
-async def create_route(record: PatientInsertAttributes, db: AsyncSession = Depends(get_db)):
+async def create_route(record: PrimaryVisitInsertAttributes, db: AsyncSession = Depends(get_db)):
     try:
         new_record = await create_primary_visit(record, db)
         return create_http_response(Http200(new_record))
@@ -43,7 +44,7 @@ async def delete_route(id: int, db: AsyncSession = Depends(get_db)):
     return create_http_response(Http200(deleted_record))
 
 @worker.patch("/primary_visits/primary_visit", description="Обновить информацию в записи")
-async def update_route(record: PatientUpdateAttributes, db: AsyncSession = Depends(get_db)):
+async def update_route(record: PrimaryVisitUpdateAttributes, db: AsyncSession = Depends(get_db)):
     updated_record = await update_primary_visit(record, db)
     if updated_record is None:
         return create_http_response(Http400({"error": "Такой записи не существует"}))

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Date, DateTime, Text, ForeignKey
+from sqlalchemy import Column, Integer, Date, DateTime, Text, ForeignKey, DECIMAL
 from sqlalchemy.orm import relationship
 from models.model import Base
 
@@ -17,11 +17,10 @@ class RepeatVisitTable(Base):
     confirmed_diagnosis = Column(Text, nullable=False)  # Подтвержденный диагноз
     result = Column(Text, nullable=False)  # Результат
     date_visit = Column(DateTime, nullable=False)  # Дата посещения
-    weight_id = Column(Integer, ForeignKey('weights.id'), nullable=True)
+    weight = Column(Integer, nullable=True)
 
     # Опциональные связи
     user = relationship("UserTable")  # Связь с врачом
     owner = relationship("OwnerTable")  # Связь с владельцем
     patient = relationship("PatientTable")  # Связь с пациентом
-    weight = relationship("WeightTable")
     primary_visit = relationship("PrimaryVisit")  # Связь с первичным посещением

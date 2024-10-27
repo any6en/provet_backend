@@ -56,3 +56,36 @@ async def global_exception_handling(request, call_next):
         return Http500(str(e)).get_response()
 
 
+def calculate_age(date_visit, date_birth):
+    """
+    Calculate the age from date_birth to date_visit.
+    Returns a string in the format 'Xг Yм Zд'.
+    """
+    # Вытаскиваем дату посещения и дату рождения как объекты datetime
+    if isinstance(date_visit, str):
+        visit_date = datetime.fromisoformat(date_visit)
+    else:
+        visit_date = date_visit
+
+    if isinstance(date_birth, str):
+        birth_date = datetime.fromisoformat(date_birth)
+    else:
+        birth_date = date_birth
+
+    # Вычисление разницы
+    years = visit_date.year - birth_date.year
+    months = visit_date.month - birth_date.month
+    days = visit_date.day - birth_date.day
+
+    # Коррекция при отрицательных значениях
+    if days < 0:
+        months -= 1
+        last_month = (visit_date.month - 1) if visit_date.month > 1 else 12
+        days += (birth_date.replace(year=birth_date.year + (1 if last_month == 12 else 0),
+                                    month=last_month) - birth_date).days
+
+    if months < 0:
+        years -= 1
+        months += 12
+
+    return f"{years}г {months}м {days}д"
