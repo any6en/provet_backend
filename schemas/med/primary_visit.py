@@ -1,4 +1,5 @@
-import decimal
+
+import logging
 from decimal import Decimal
 from typing import Optional
 from datetime import datetime
@@ -22,6 +23,14 @@ class PrimaryVisitInsertAttributes(BaseModel):
     @root_validator(pre=True)
     def validate_ids(cls, values):
         keys = values.keys()
+
+        weight = values.get("weight")
+        if weight is not None:
+            if not isinstance(weight, (int, float)):
+                try:
+                    values["weight"] = float(weight)  # Пытаемся конвертировать в float
+                except (ValueError, TypeError):
+                    raise HTTPException(status_code=400, detail="Вес должен быть числом")
 
         if "user_id" not in keys or values.get("user_id") is None:
             raise HTTPException(status_code=400, detail="Не указан идентификатор врача")
@@ -66,6 +75,13 @@ class PrimaryVisitUpdateAttributes(BaseModel):
     def pre_validator(cls, values):
         keys = values.keys()
 
+        weight = values.get("weight")
+        if weight is not None:
+            if not isinstance(weight, (int, float)):
+                try:
+                    values["weight"] = float(weight)  # Пытаемся конвертировать в float
+                except (ValueError, TypeError):
+                    raise HTTPException(status_code=400, detail="Вес должен быть числом")
         # Проверяем, что хотя бы одно поле для обновления указано
         if all(key not in keys for key in
                ["user_id", "owner_id", "patient_id", "disease_onset_date", "anamnesis", "examination",
@@ -73,13 +89,6 @@ class PrimaryVisitUpdateAttributes(BaseModel):
             raise HTTPException(
                 status_code=400,
                 detail="Не указаны данные для обновления"
-            )
-
-        # Проверяем наличие обязательного поля, если оно указано
-        if "disease_onset_date" in keys and values.get("disease_onset_date") is None:
-            raise HTTPException(
-                status_code=400,
-                detail="Дата возникновения болезни должна быть указана, если обновляется"
             )
 
         return values

@@ -31,14 +31,24 @@ class PrimaryVisitTable(Base):
             'user_id': self.user_id,
             'owner_id': self.owner_id,
             'patient_id': self.patient_id,
-            'disease_onset_date': self.disease_onset_date,
+            'disease_onset_date': self.disease_onset_date.isoformat() if self.disease_onset_date else None,
             'anamnesis': self.anamnesis,
             'examination': self.examination,
             'prelim_diagnosis': self.prelim_diagnosis,
             'confirmed_diagnosis': self.confirmed_diagnosis,
             'result': self.result,
-            'date_visit': self.date_visit,
+            'date_visit': self.date_visit.isoformat() if self.date_visit else None,
             'weight': float(self.weight) if self.weight else None
+        }
+
+    def to_dict_journal(self):
+        return {
+            'id': self.id,
+            'date_visit': self.date_visit.isoformat() if self.date_visit else None,
+            'content': "Первичный прием",
+            "doctor_full_name": self.user.last_name + " " + self.user.first_name[0] + ". " + self.user.patronymic[0] + ".",
+            "primary_visit_id": None,
+            "subRows": []
         }
 
     def to_dict_for_document(self):
@@ -50,11 +60,36 @@ class PrimaryVisitTable(Base):
             'nickname': self.patient.nickname,
             'age': calculate_age(self.date_visit, self.patient.date_birth),
             'gender': "Самец" if self.patient.gender == 1 else "Самка" if self.patient.gender == 2 else "Не указано",
-            'prelim_diagnosis ': self.prelim_diagnosis ,
+            'prelim_diagnosis ': self.prelim_diagnosis,
+            'confirmed_diagnosis ': self.confirmed_diagnosis,
             'disease_onset_date': self.disease_onset_date,
             'anamnesis': self.anamnesis,
             'examination': self.examination,
             'result': self.result,
             'date_visit': self.date_visit.isoformat() if self.date_visit else None,
             'weight': float(self.weight) if self.weight else None
+        }
+
+    def to_dict_visits(self):
+        return {
+            'id': self.id,
+            'primary_visit_id': self.id,
+            'user_id': self.user_id,
+            'owner_id': self.owner_id,
+            'patient_id': self.patient_id,
+            'date_visit': self.date_visit.isoformat(),
+            'anamnesis': self.anamnesis,
+            'examination': self.examination,
+            'prelim_diagnosis': self.prelim_diagnosis,
+            'confirmed_diagnosis': self.confirmed_diagnosis,
+            'result': self.result,
+            'weight': float(self.weight),
+            'disease_onset_date': self.disease_onset_date.isoformat(),
+            'breed_name': self.patient.breed.name,
+            'animal_name': self.patient.animal_type.name,
+            'nickname': self.patient.nickname,
+            'age': calculate_age(self.date_visit, self.patient.date_birth),
+            'content': "Первичный прием",
+            'owner_full_name': self.owner.last_name + " " + self.owner.first_name + " " + self.owner.patronymic,
+            'doctor_full_name': self.user.last_name + " " + self.user.first_name + " " + self.user.patronymic,
         }

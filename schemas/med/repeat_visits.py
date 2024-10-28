@@ -2,6 +2,7 @@ from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel, Field, root_validator
 from fastapi import HTTPException
+from decimal import Decimal
 
 class RepeatVisitInsertAttributes(BaseModel):
     """Атрибуты повторного посещения"""
@@ -16,10 +17,19 @@ class RepeatVisitInsertAttributes(BaseModel):
     confirmed_diagnosis: str = Field(..., description="Подтвержденный диагноз")
     result: str = Field(..., description="Результат")
     date_visit: Optional[datetime] = Field(default_factory=datetime.now, description="Дата посещения (по умолчанию текущее время)")
+    weight: Optional[Decimal] = Field(None, description="вес (тип DECIMAL(10, 2))")
 
     @root_validator(pre=True)
     def validate_ids(cls, values):
         keys = values.keys()
+
+        weight = values.get("weight")
+        if weight is not None:
+            if not isinstance(weight, (int, float)):
+                try:
+                    values["weight"] = float(weight)  # Пытаемся конвертировать в float
+                except (ValueError, TypeError):
+                    raise HTTPException(status_code=400, detail="Вес должен быть числом")
 
         if "user_id" not in keys or values.get("user_id") is None:
             raise HTTPException(status_code=400, detail="Не указан идентификатор врача")
@@ -61,10 +71,20 @@ class RepeatVisitUpdateAttributes(BaseModel):
     confirmed_diagnosis: Optional[str] = Field(None, description="Подтвержденный диагноз")
     result: Optional[str] = Field(None, description="Результат")
     date_visit: Optional[datetime] = Field(None, description="Дата посещения (по умолчанию текущее время)")
+    weight: Optional[Decimal] = Field(None, description="вес (тип DECIMAL(10, 2))")
 
     @root_validator(pre=True)
     def pre_validator(cls, values):
         keys = values.keys()
+
+        weight = values.get("weight")
+        if weight is not None:
+            if not isinstance(weight, (int, float)):
+                try:
+                    values["weight"] = float(weight)  # Пытаемся конвертировать в float
+                except (ValueError, TypeError):
+                    raise HTTPException(status_code=400, detail="Вес должен быть числом")
+
         if "id" not in keys or values.get("id") is None:
             raise HTTPException(status_code=400, detail="Не указан идентификатор записи для обновления")
         return values

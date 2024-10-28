@@ -3,14 +3,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 import logging
 
-from models.med.primary_visit import PrimaryVisitTable
-from schemas.med.primary_visit import PrimaryVisitUpdateAttributes, PrimaryVisitInsertAttributes
+from models.med.repeat_visit import RepeatVisitTable
+from schemas.med.repeat_visits import RepeatVisitInsertAttributes, RepeatVisitUpdateAttributes
 
 
-async def get_primary_visits(db: AsyncSession, id: int = None):
+async def get_repeat_visits(db: AsyncSession, id: int = None):
     if id is None:
         query = await db.execute(
-            select(PrimaryVisitTable)
+            select(RepeatVisitTable)
         )
         rows = query.scalars().all()
 
@@ -30,7 +30,7 @@ async def get_primary_visits(db: AsyncSession, id: int = None):
         return result
 
     query = await db.execute(
-        select(PrimaryVisitTable).filter_by(id=id)
+        select(RepeatVisitTable).filter_by(id=id)
     )
     result = query.scalars().first()
 
@@ -39,53 +39,37 @@ async def get_primary_visits(db: AsyncSession, id: int = None):
     return dict if result else None
 
 
-async def create_primary_visit(record: PrimaryVisitInsertAttributes, db: AsyncSession):
+async def create_repeat_visit(record: RepeatVisitInsertAttributes, db: AsyncSession):
     formated_record = record.dict(include=record.__fields_set__)
+    logging.info(record)
+    logging.error(record)
 
     query = await db.execute(
-        insert(PrimaryVisitTable).values(**formated_record)
+        insert(RepeatVisitTable).values(**formated_record)
     )
 
     # Отправляем в БД
     await db.commit()
 
-    result = await db.execute(select(PrimaryVisitTable).filter_by(id=query.inserted_primary_key[0]))
-    response = result.scalars().first()
-
-    return response.to_dict()
-
-
-async def delete_primary_visit(id: int, db: AsyncSession):
-    # Выполняем запрос для нахождения записи по ID
-    result = await db.execute(select(PrimaryVisitTable).filter_by(id=id))
+    result = await db.execute(select(RepeatVisitTable).filter_by(id=query.inserted_primary_key[0]))
     result = result.scalars().first()
-
-    # Проверка, существует ли запись для удаления
-    if result is None:
-        return None
-
-    # Удаляем запись
-    await db.delete(result)
-    await db.commit()
 
     dict = result.to_dict()
 
-    date = dict.get('date')
-    if date is not None:
-        dict['date'] = date.isoformat()
+    date_visit = dict.get('date_visit')
+    if date_visit is not None:
+        dict['date_visit'] = date_visit.isoformat()
 
     disease_onset_date = dict.get('disease_onset_date')
     if disease_onset_date is not None:
         dict['disease_onset_date'] = disease_onset_date.isoformat()
 
-    # Возвращаем обновленный объект в виде словаря
-    return dict if result else None
+    return dict
 
-
-async def update_primary_visit(record: PrimaryVisitUpdateAttributes, db: AsyncSession):
+async def update_repeat_visit(record: RepeatVisitUpdateAttributes, db: AsyncSession):
     try:
         # Обновляем запись
-        query = update(PrimaryVisitTable).where(PrimaryVisitTable.id == record.id).values(
+        query = update(RepeatVisitTable).where(RepeatVisitTable.id == record.id).values(
             **record.dict(exclude_unset=True)
         )
 
@@ -94,17 +78,25 @@ async def update_primary_visit(record: PrimaryVisitUpdateAttributes, db: AsyncSe
         await db.commit()
 
         # Извлекаем обновленную запись
-        result = await db.execute(select(PrimaryVisitTable).where(PrimaryVisitTable.id == record.id))
+        result = await db.execute(select(RepeatVisitTable).where(RepeatVisitTable.id == record.id))
         result = result.scalars().first()
 
         dict = result.to_dict()
 
+        date_visit = dict.get('date_visit')
+        if date_visit is not None:
+            dict['date_visit'] = date_visit.isoformat()
+
+        disease_onset_date = dict.get('disease_onset_date')
+        if disease_onset_date is not None:
+            dict['disease_onset_date'] = disease_onset_date.isoformat()
+
         # Возвращаем обновленный объект в виде словаря
         return dict if result else None
-
     except Exception as e:
         logging.info(e.args)
         logging.error(e.args)
 
         await db.rollback()  # Откат при ошибке
         raise e  # Бросаем исключение дальше
+

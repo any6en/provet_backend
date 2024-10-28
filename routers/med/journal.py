@@ -15,11 +15,11 @@ async def get_db():
         yield session
 
 @worker.get("/journal", description="Получение списка ")
-async def get_route(owner_id: int = None, db: AsyncSession = Depends(get_db)):
+async def get_route(patient_id: int = None, db: AsyncSession = Depends(get_db)):
     if id is None:
         return create_http_response(Http400({"Требуется указать идентификатор пациента"}))
 
-    records = await get_journal(db, owner_id)
+    records = await get_journal(db, patient_id)
 
     return create_http_response(Http200({"records": len(records), "rows": records}))
 

@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from models.model import Base
 
 
-class VaccinationAct(Base):
+class VaccinationActTable(Base):
     __tablename__ = "vaccination_acts"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -19,3 +19,12 @@ class VaccinationAct(Base):
     user = relationship("UserTable")  # Предполагая, что у вас есть модель User
     owner = relationship("OwnerTable")  # Предполагая, что у вас есть модель Owner
     patient = relationship("PatientTable")  # Предполагая, что у вас есть модель Patient
+
+    def to_dict_journal(self):
+        return {
+            'id': self.id,
+            'date_visit': self.vaccination_date.isoformat() if self.vaccination_date else None,
+            'content': "Акт вакцинации",
+            "doctor_full_name": self.user.last_name + " " + self.user.first_name[0] + ". " + self.user.patronymic[0] + ".",
+            "primary_visit_id": None
+        }

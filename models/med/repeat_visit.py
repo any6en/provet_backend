@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, Date, DateTime, Text, ForeignKey, DECIMAL
 from sqlalchemy.orm import relationship
 from models.model import Base
+from utils.utils import calculate_age
+
 
 class RepeatVisitTable(Base):
     __tablename__ = "repeat_visits"
@@ -23,4 +25,54 @@ class RepeatVisitTable(Base):
     user = relationship("UserTable")  # Связь с врачом
     owner = relationship("OwnerTable")  # Связь с владельцем
     patient = relationship("PatientTable")  # Связь с пациентом
-    primary_visit = relationship("PrimaryVisit")  # Связь с первичным посещением
+    primary_visit = relationship("PrimaryVisitTable")  # Связь с первичным посещением
+
+    def to_dict_journal(self):
+        return {
+            'id': self.id,
+            'date_visit': self.date_visit.isoformat() if self.date_visit else None,
+            'content': "Повторный прием",
+            "doctor_full_name": self.user.last_name + " " + self.user.first_name[0] + ". " + self.user.patronymic[0] + ".",
+            "primary_visit_id": self.primary_visit_id
+        }
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'primary_visit_id': self.primary_visit_id,
+            'user_id': self.user_id,
+            'owner_id': self.owner_id,
+            'patient_id': self.patient_id,
+            'disease_onset_date': self.disease_onset_date,
+            'anamnesis': self.anamnesis,
+            'examination': self.examination,
+            'prelim_diagnosis': self.prelim_diagnosis,
+            'confirmed_diagnosis': self.confirmed_diagnosis,
+            'result': self.result,
+            'date_visit': self.date_visit,
+            'weight': float(self.weight) if self.weight else None
+        }
+
+    def to_dict_visits(self):
+        return {
+            'id': self.id,
+            'primary_visit_id': self.primary_visit_id,
+            'user_id': self.user_id,
+            'owner_id': self.owner_id,
+            'patient_id': self.patient_id,
+            'date_visit': self.date_visit.isoformat(),
+            'anamnesis': self.anamnesis,
+            'examination': self.examination,
+            'prelim_diagnosis': self.prelim_diagnosis,
+            'confirmed_diagnosis': self.confirmed_diagnosis,
+            'result': self.result,
+            'weight': float(self.weight) if self.weight else None,
+            'disease_onset_date': self.disease_onset_date.isoformat(),
+            'breed_name': self.patient.breed.name,
+            'animal_name': self.patient.animal_type.name,
+            'nickname': self.patient.nickname,
+            'age': calculate_age(self.date_visit, self.patient.date_birth),
+            'content': "Первичный прием",
+            'owner_full_name': self.owner.last_name + " " + self.owner.first_name + " " + self.owner.patronymic,
+            'doctor_full_name': self.user.last_name + " " + self.user.first_name + " " + self.user.patronymic,
+        }

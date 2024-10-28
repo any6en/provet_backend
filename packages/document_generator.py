@@ -30,8 +30,6 @@ async def get_document_primary_visit(db: AsyncSession, primary_visit_id: int):
         return None
 
     primary_visit = primary_visit.to_dict_for_document()
-    logging.error(primary_visit)
-    logging.info(primary_visit)
 
     doc = DocxTemplate("resources/Назначение.docx")
     doc.render(primary_visit)

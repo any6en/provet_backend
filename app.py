@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from routers import ping
-from routers.directories import owner, animal_type, breed, patient, primary_visit, user
+from routers.directories import owner, animal_type, breed, patient, primary_visit, repeat_visit, user
 from routers.med import journal
 from routers import document_generator
 
@@ -18,7 +18,9 @@ app.include_router(owner.worker, prefix=f'/api/directories', tags=["owners"])
 app.include_router(animal_type.worker, prefix=f'/api/directories', tags=["animal_types"])
 app.include_router(breed.worker, prefix=f'/api/directories', tags=["breeds"])
 app.include_router(patient.worker, prefix=f'/api/directories', tags=["patients"])
+
 app.include_router(primary_visit.worker, prefix=f'/api/directories', tags=["primary_visits"])
+app.include_router(repeat_visit.worker, prefix=f'/api/directories', tags=["repeat_visits"])
 
 
 app.include_router(journal.worker, prefix=f'/api', tags=["journal"])
