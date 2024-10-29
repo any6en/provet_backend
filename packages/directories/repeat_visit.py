@@ -18,14 +18,6 @@ async def get_repeat_visits(db: AsyncSession, id: int = None):
         for row in rows:
             dict = row.to_dict()
 
-            disease_onset_date = dict.get('disease_onset_date')
-            if disease_onset_date is not None:
-                dict['disease_onset_date'] = disease_onset_date.isoformat()
-
-            date_visit = dict.get('date_visit')
-            if date_visit is not None:
-                dict['date_visit'] = date_visit.isoformat()
-
             result.append(dict)
         return result
 
@@ -56,14 +48,6 @@ async def create_repeat_visit(record: RepeatVisitInsertAttributes, db: AsyncSess
 
     dict = result.to_dict()
 
-    date_visit = dict.get('date_visit')
-    if date_visit is not None:
-        dict['date_visit'] = date_visit.isoformat()
-
-    disease_onset_date = dict.get('disease_onset_date')
-    if disease_onset_date is not None:
-        dict['disease_onset_date'] = disease_onset_date.isoformat()
-
     return dict
 
 async def update_repeat_visit(record: RepeatVisitUpdateAttributes, db: AsyncSession):
@@ -83,14 +67,6 @@ async def update_repeat_visit(record: RepeatVisitUpdateAttributes, db: AsyncSess
 
         dict = result.to_dict()
 
-        date_visit = dict.get('date_visit')
-        if date_visit is not None:
-            dict['date_visit'] = date_visit.isoformat()
-
-        disease_onset_date = dict.get('disease_onset_date')
-        if disease_onset_date is not None:
-            dict['disease_onset_date'] = disease_onset_date.isoformat()
-
         # Возвращаем обновленный объект в виде словаря
         return dict if result else None
     except Exception as e:
@@ -100,3 +76,19 @@ async def update_repeat_visit(record: RepeatVisitUpdateAttributes, db: AsyncSess
         await db.rollback()  # Откат при ошибке
         raise e  # Бросаем исключение дальше
 
+async def delete_repeat_visit(id: int, db: AsyncSession):
+    # Выполняем запрос для нахождения записи по ID
+    result = await db.execute(select(RepeatVisitTable).filter_by(id=id))
+    result = result.scalars().first()
+
+    # Проверка, существует ли запись для удаления
+    if result is None:
+        return None
+
+    # Удаляем запись
+    await db.delete(result)
+    await db.commit()
+
+    dict = result.to_dict()
+
+    return dict

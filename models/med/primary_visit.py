@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import Column, Integer, Date, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from models.model import Base
@@ -60,8 +62,8 @@ class PrimaryVisitTable(Base):
             'nickname': self.patient.nickname,
             'age': calculate_age(self.date_visit, self.patient.date_birth),
             'gender': "Самец" if self.patient.gender == 1 else "Самка" if self.patient.gender == 2 else "Не указано",
-            'prelim_diagnosis ': self.prelim_diagnosis,
-            'confirmed_diagnosis ': self.confirmed_diagnosis,
+            'prelim_diagnosis': self.prelim_diagnosis,
+            'confirmed_diagnosis': self.confirmed_diagnosis,
             'disease_onset_date': self.disease_onset_date,
             'anamnesis': self.anamnesis,
             'examination': self.examination,
@@ -78,6 +80,7 @@ class PrimaryVisitTable(Base):
             'owner_id': self.owner_id,
             'patient_id': self.patient_id,
             'date_visit': self.date_visit.isoformat(),
+            'now_age': calculate_age(datetime.now(), self.patient.date_birth),
             'anamnesis': self.anamnesis,
             'examination': self.examination,
             'prelim_diagnosis': self.prelim_diagnosis,
@@ -86,6 +89,7 @@ class PrimaryVisitTable(Base):
             'weight': float(self.weight),
             'disease_onset_date': self.disease_onset_date.isoformat(),
             'breed_name': self.patient.breed.name,
+            'animal_type_id': self.patient.animal_type.id,
             'animal_name': self.patient.animal_type.name,
             'nickname': self.patient.nickname,
             'age': calculate_age(self.date_visit, self.patient.date_birth),

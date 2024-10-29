@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import Column, Integer, Date, DateTime, Text, ForeignKey, DECIMAL
 from sqlalchemy.orm import relationship
 from models.model import Base
@@ -43,13 +45,13 @@ class RepeatVisitTable(Base):
             'user_id': self.user_id,
             'owner_id': self.owner_id,
             'patient_id': self.patient_id,
-            'disease_onset_date': self.disease_onset_date,
+            'disease_onset_date': self.disease_onset_date.isoformat() if self.disease_onset_date else None,
             'anamnesis': self.anamnesis,
             'examination': self.examination,
             'prelim_diagnosis': self.prelim_diagnosis,
             'confirmed_diagnosis': self.confirmed_diagnosis,
             'result': self.result,
-            'date_visit': self.date_visit,
+            'date_visit': self.date_visit.isoformat() if self.date_visit else None,
             'weight': float(self.weight) if self.weight else None
         }
 
@@ -75,4 +77,23 @@ class RepeatVisitTable(Base):
             'content': "Первичный прием",
             'owner_full_name': self.owner.last_name + " " + self.owner.first_name + " " + self.owner.patronymic,
             'doctor_full_name': self.user.last_name + " " + self.user.first_name + " " + self.user.patronymic,
+        }
+
+    def to_dict_for_document(self):
+        return {
+            'id': self.id,
+            'doctor': self.user.last_name + " " + self.user.first_name[0] + ". " + self.user.patronymic[0] + ".",
+            'owner': self.owner.last_name + " " + self.owner.first_name + ". " + self.owner.patronymic,
+            'breed': self.patient.breed.name,
+            'nickname': self.patient.nickname,
+            'age': calculate_age(self.date_visit, self.patient.date_birth),
+            'gender': "Самец" if self.patient.gender == 1 else "Самка" if self.patient.gender == 2 else "Не указано",
+            'prelim_diagnosis': self.prelim_diagnosis,
+            'confirmed_diagnosis': self.confirmed_diagnosis,
+            'disease_onset_date': self.disease_onset_date,
+            'anamnesis': self.anamnesis,
+            'examination': self.examination,
+            'result': self.result,
+            'date_visit': self.date_visit.isoformat() if self.date_visit else None,
+            'weight': float(self.weight) if self.weight else None
         }

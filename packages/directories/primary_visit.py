@@ -108,3 +108,20 @@ async def update_primary_visit(record: PrimaryVisitUpdateAttributes, db: AsyncSe
 
         await db.rollback()  # Откат при ошибке
         raise e  # Бросаем исключение дальше
+
+async def delete_primary_visit(id: int, db: AsyncSession):
+    # Выполняем запрос для нахождения записи по ID
+    result = await db.execute(select(PrimaryVisitTable).filter_by(id=id))
+    result = result.scalars().first()
+
+    # Проверка, существует ли запись для удаления
+    if result is None:
+        return None
+
+    # Удаляем запись
+    await db.delete(result)
+    await db.commit()
+
+    dict = result.to_dict()
+
+    return dict

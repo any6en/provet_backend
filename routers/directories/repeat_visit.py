@@ -3,7 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 import logging
 from database import AsyncSessionLocal
-from packages.directories.repeat_visit import get_repeat_visits, create_repeat_visit, update_repeat_visit
+from packages.directories.repeat_visit import get_repeat_visits, create_repeat_visit, update_repeat_visit, \
+    delete_repeat_visit
 from schemas.med.repeat_visits import RepeatVisitInsertAttributes, RepeatVisitUpdateAttributes
 from utils.responses import create_http_response, Http200, Http400
 
@@ -36,7 +37,7 @@ async def create_route(record: RepeatVisitInsertAttributes, db: AsyncSession = D
 
 @worker.delete("/repeat_visits/repeat_visit/{id}", description="Удаление записи по переданному Id")
 async def delete_route(id: int, db: AsyncSession = Depends(get_db)):
-    deleted_record = await delete_primary_repeat(id, db)
+    deleted_record = await delete_repeat_visit(id, db)
     if deleted_record is None:
         return create_http_response(Http400({"error": "Такой записи не существует"}))
 
