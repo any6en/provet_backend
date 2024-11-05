@@ -86,7 +86,7 @@ class PrimaryVisitTable(Base):
             'prelim_diagnosis': self.prelim_diagnosis,
             'confirmed_diagnosis': self.confirmed_diagnosis,
             'result': self.result,
-            'weight': float(self.weight),
+            'weight': float(self.weight) if self.weight else None,
             'disease_onset_date': self.disease_onset_date.isoformat(),
             'breed_name': self.patient.breed.name,
             'animal_type_id': self.patient.animal_type.id,

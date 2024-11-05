@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import logging
 from database import AsyncSessionLocal
 from packages.directories.primary_visit import get_primary_visits, create_primary_visit, delete_primary_visit, \
     update_primary_visit
@@ -32,7 +31,6 @@ async def create_route(record: PrimaryVisitInsertAttributes, db: AsyncSession = 
         new_record = await create_primary_visit(record, db)
         return create_http_response(Http200(new_record))
     except Exception as e:
-        logging.error(e.args)
         return create_http_response(Http400(e.args))
 
 @worker.delete("/primary_visits/primary_visit/{id}", description="Удаление записи по переданному Id")

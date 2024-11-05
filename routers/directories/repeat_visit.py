@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import logging
 from database import AsyncSessionLocal
 from packages.directories.repeat_visit import get_repeat_visits, create_repeat_visit, update_repeat_visit, \
     delete_repeat_visit
@@ -32,7 +31,6 @@ async def create_route(record: RepeatVisitInsertAttributes, db: AsyncSession = D
         new_record = await create_repeat_visit(record, db)
         return create_http_response(Http200(new_record))
     except Exception as e:
-        logging.error(e.args)
         return create_http_response(Http400(e.args))
 
 @worker.delete("/repeat_visits/repeat_visit/{id}", description="Удаление записи по переданному Id")

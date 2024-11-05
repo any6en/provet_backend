@@ -1,6 +1,10 @@
+import datetime
+
 from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from models.model import Base
+from utils.utils import calculate_age
+
 
 class PatientTable(Base):
     __tablename__ = "patients"
@@ -53,4 +57,20 @@ class PatientTable(Base):
             "date_birth": self.date_birth,
             "gender": self.gender,
             "created_at": self.created_at,
+        }
+
+    def to_dict_info(self):
+        return {
+            "id": self.id,
+            "nickname": self.nickname,
+
+            "animal_type_name": self.animal_type.name,
+            "breed_name": self.breed.name,
+            "color": "в скором времени добавим поле",
+            "castrated": "в скором времени добавим поле",
+
+            "age": calculate_age(datetime.datetime.now(), self.date_birth),
+            "date_birth": self.date_birth.isoformat() if self.date_birth else None,
+            "gender": self.gender,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
         }

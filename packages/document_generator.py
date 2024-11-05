@@ -10,7 +10,6 @@ from models.directories.owner import OwnerTable
 from models.directories.patient import PatientTable
 from models.med.primary_visit import PrimaryVisitTable
 from models.med.repeat_visit import RepeatVisitTable
-import logging
 
 from utils.responses import Http400, create_http_response
 
@@ -50,7 +49,6 @@ async def get_document_primary_visit(db: AsyncSession, primary_visit_id: int):
     )
 
 async def get_document_repeat_visit(db: AsyncSession, repeat_visit_id: int):
-    logging.error(repeat_visit_id)
     query = await db.execute(
         select(RepeatVisitTable)
         .options(
@@ -74,7 +72,6 @@ async def get_document_repeat_visit(db: AsyncSession, repeat_visit_id: int):
     doc = DocxTemplate("resources/Назначение.docx")
     doc.render(repeat_visit)
     doc.save(docx_path)
-    logging.error(repeat_visit)
 
     # Конвертация в PDF
     convert(docx_path, pdf_path)

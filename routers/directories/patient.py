@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import logging
 from database import AsyncSessionLocal
 from schemas.directories.patient import PatientInsertAttributes, PatientUpdateAttributes
 from utils.responses import create_http_response, Http200, Http400
-from packages.directories.patient import get_patients, create_patient, delete_patient, update_patient
+from packages.directories.patient import get_patients, create_patient, delete_patient, update_patient, get_patient_info
 
 # Роутер для владельцев
 worker = APIRouter()
@@ -33,7 +32,6 @@ async def create_route(record: PatientInsertAttributes, db: AsyncSession = Depen
         new_record = await create_patient(record, db)
         return create_http_response(Http200(new_record))
     except Exception as e:
-        logging.error(e.args)
         return create_http_response(Http400(e.args))
 
 @worker.delete("/patients/patient/{id}", description="Удаление записи по переданному Id")
@@ -51,3 +49,14 @@ async def update_route(record: PatientUpdateAttributes, db: AsyncSession = Depen
         return create_http_response(Http400({"error": "Такой записи не существует"}))
 
     return create_http_response(Http200(updated_record))
+
+@worker.get("/patients/patient/info", description="Получение информации")
+async def get_route(id: int = None, db: AsyncSession = Depends(get_db)):
+    if id is None:
+        return create_http_response(Http200("Идентификатор обязателен"))
+
+    record = await get_patient_info(db, id)
+    if record is None:
+        return create_http_response(Http400({"error": "Такой записи не существует"}))
+
+    return create_http_response(Http200(record))

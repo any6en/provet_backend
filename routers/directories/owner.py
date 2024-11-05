@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import logging
 from database import AsyncSessionLocal
 from schemas.directories.owner import OwnerInsertAttributes, OwnerUpdateAttributes
 from utils.responses import create_http_response, Http200, Http400
@@ -33,7 +32,6 @@ async def create_route(record: OwnerInsertAttributes, db: AsyncSession = Depends
         new_record = await create_owner(record, db)
         return create_http_response(Http200(new_record))
     except Exception as e:
-        logging.error(e.args)
         return create_http_response(Http400(e.args))
 
 @worker.delete("/owners/owner/{id}", description="Удаление владельца по переданному Id")

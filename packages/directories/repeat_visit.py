@@ -1,7 +1,6 @@
 from sqlalchemy import insert, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-import logging
 
 from models.med.repeat_visit import RepeatVisitTable
 from schemas.med.repeat_visits import RepeatVisitInsertAttributes, RepeatVisitUpdateAttributes
@@ -33,8 +32,6 @@ async def get_repeat_visits(db: AsyncSession, id: int = None):
 
 async def create_repeat_visit(record: RepeatVisitInsertAttributes, db: AsyncSession):
     formated_record = record.dict(include=record.__fields_set__)
-    logging.info(record)
-    logging.error(record)
 
     query = await db.execute(
         insert(RepeatVisitTable).values(**formated_record)
@@ -70,8 +67,6 @@ async def update_repeat_visit(record: RepeatVisitUpdateAttributes, db: AsyncSess
         # Возвращаем обновленный объект в виде словаря
         return dict if result else None
     except Exception as e:
-        logging.info(e.args)
-        logging.error(e.args)
 
         await db.rollback()  # Откат при ошибке
         raise e  # Бросаем исключение дальше

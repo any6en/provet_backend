@@ -1,7 +1,6 @@
 from sqlalchemy import insert, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-import logging
 
 from models.med.primary_visit import PrimaryVisitTable
 from schemas.med.primary_visit import PrimaryVisitUpdateAttributes, PrimaryVisitInsertAttributes
@@ -103,8 +102,6 @@ async def update_primary_visit(record: PrimaryVisitUpdateAttributes, db: AsyncSe
         return dict if result else None
 
     except Exception as e:
-        logging.info(e.args)
-        logging.error(e.args)
 
         await db.rollback()  # Откат при ошибке
         raise e  # Бросаем исключение дальше

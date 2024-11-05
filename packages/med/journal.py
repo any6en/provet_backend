@@ -1,6 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text, select
-import logging
 
 from sqlalchemy.orm import selectinload
 
@@ -27,7 +26,6 @@ async def get_journal(db: AsyncSession, patient_id: int = None):
     # Первичные приемы
     primary_visits = query.scalars().all()
     primary_visits_list = [pv.to_dict_journal() for pv in primary_visits]
-    logging.error(primary_visits)
 
     # Запрашиваем повторные визиты
     repeat_query = await db.execute(
@@ -44,7 +42,6 @@ async def get_journal(db: AsyncSession, patient_id: int = None):
     # Повторные приемы
     repeat_visits = repeat_query.scalars().all()
     repeat_visits_list = [rv.to_dict_journal() for rv in repeat_visits]
-    logging.error(repeat_visits_list)
 
     # Запрашиваем акты вакцинации
     vac_act_query = await db.execute(
@@ -61,7 +58,6 @@ async def get_journal(db: AsyncSession, patient_id: int = None):
     # Акты вакцинации
     vac_acts = vac_act_query.scalars().all()
     vac_acts_list = [va.to_dict_journal() for va in vac_acts]
-    logging.error(vac_acts_list)
 
     # Структура ответа
     response_data = []
@@ -96,8 +92,6 @@ async def get_journal_visits(db: AsyncSession, primary_visit_id: int = None):
     )
 
     primary_visit = query.scalars().first()
-    logging.info(primary_visit)
-    logging.error(primary_visit)
     if primary_visit is None:
         return None
 

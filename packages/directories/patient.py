@@ -155,3 +155,12 @@ async def update_patient(record: PatientUpdateAttributes, db: AsyncSession):
     except Exception as e:
         await db.rollback()  # Откат при ошибке
         raise e  # Бросаем исключение дальше
+
+
+async def get_patient_info(db: AsyncSession, id: int = None):
+    if id is not None:
+        query = await db.execute(
+            select(PatientTable).options(selectinload(PatientTable.animal_type)).options(
+                selectinload(PatientTable.breed)).filter_by(id=id)
+        )
+        return query.scalars().first().to_dict_info()
