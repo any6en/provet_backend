@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import AsyncSessionLocal
-from packages.document_generator import get_consent_processing_personal_data, get_document_primary_visit, \
-    get_document_repeat_visit
+from packages.document_generator import get_document_primary_visit, get_pd_agreement_sign, get_document_repeat_visit
+from schemas.directories.owner import OwnerAgreementSignPD
 
 # Роутер
 worker = APIRouter()
@@ -26,8 +26,8 @@ async def get_route(repeat_visit_id: int = None, db: AsyncSession = Depends(get_
 
     return records
 
-@worker.get("/document_generator/consent_processing_personal_data", description="Генерация документа")
-async def get_route(primary_visit_id: int = None, db: AsyncSession = Depends(get_db)):
-    records = await get_consent_processing_personal_data(db, primary_visit_id)
+@worker.post("/document_generator/pd_agreement_sign", description="Генерация документа")
+async def get_route(record: OwnerAgreementSignPD, db: AsyncSession = Depends(get_db)):
+    records = await get_pd_agreement_sign(db, record)
 
     return records

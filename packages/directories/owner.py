@@ -7,104 +7,78 @@ from schemas.directories.owner import OwnerInsertAttributes, OwnerUpdateAttribut
 
 
 async def get_owners(db: AsyncSession, id: int = None):
+    # Если нужен весь справочник-
     if id is None:
-        query_rows = text("SELECT * FROM provet.owners;")
-        result_rows = await db.execute(query_rows)
-        rows = result_rows.all()
+        query = await db.execute(
+            select(OwnerTable)
+        )
+        rows = query.scalars().all()
 
         result = []
         for row in rows:
-            owner_dict = row._asdict()
-            created_at = owner_dict.get('created_at')
-            if created_at is not None:
-                owner_dict['created_at'] = created_at.isoformat()
-
-            date_birth = owner_dict.get('date_birth')
-            if date_birth is not None:
-                owner_dict['date_birth'] = date_birth.isoformat()
-
-            result.append(owner_dict)
+            result.append(row.to_dict())
         return result
-
-    query_rows = text("SELECT * FROM provet.owners WHERE id = :id")
-    result_rows = await db.execute(query_rows, {"id": id})
-    result_rows = result_rows.all()
-
-    if result_rows is None:
-        return None
-
-    result = result_rows[0]._asdict()
-
-    created_at = result.get('created_at')
-    if created_at is not None:
-        result['created_at'] = created_at.isoformat()
-
-    date_birth = result.get('date_birth')
-    if date_birth is not None:
-        result['date_birth'] = date_birth.isoformat()
-
-    return result
-
-async def create_owner(owner: OwnerInsertAttributes, db: AsyncSession):
-    owner_attrs = owner.dict(include=owner.__fields_set__)
-    result = await db.execute(
-        insert(OwnerTable).values(**owner_attrs)
+    # Если нужна только конкретная запись из справочника
+    query = await db.execute(
+        select(OwnerTable).filter_by(id=id)
     )
-    new_owner_id = result.inserted_primary_key[0]
-    new_owner_result = await db.execute(select(OwnerTable).filter_by(id=new_owner_id))
-    new_owner = new_owner_result.scalars().first()
+    result = query.scalars().first()
 
-    new_owner_data = {
-        "id": new_owner.id,
-        "first_name": new_owner.first_name,
-        "last_name": new_owner.last_name,
-        "patronymic": new_owner.patronymic,
-        "address": new_owner.address,
-        "gender": new_owner.gender,
-        "date_birth": new_owner.date_birth.isoformat() if new_owner.date_birth else None,
-        "created_at": datetime.now().isoformat()
-    }
+    dict = result.to_dict()
 
-    await db.flush()
+    return dict if result else None
+
+async def create_owner(record: OwnerInsertAttributes, db: AsyncSession):
+    formated_record = record.dict(include=record.__fields_set__)
+
+    query = await db.execute(
+        insert(OwnerTable).values(**formated_record)
+    )
+
+    # Отправляем в БД
     await db.commit()
-    return new_owner_data
+
+    result = await db.execute(select(OwnerTable).filter_by(id=query.inserted_primary_key[0]))
+    response = result.scalars().first()
+
+    return response.to_dict()
 
 async def delete_owner(id: int, db: AsyncSession):
+    # Выполняем запрос для нахождения записи по ID
     result = await db.execute(select(OwnerTable).filter_by(id=id))
-    owner = result.scalars().first()
+    result = result.scalars().first()
 
-    if owner is None:
+    # Проверка, существует ли запись для удаления
+    if result is None:
         return None
 
-    await db.delete(owner)
+    # Удаляем запись
+    await db.delete(result)
     await db.commit()
-    deleted_owner_data = {
-        "id": owner.id,
-        "first_name": owner.first_name,
-        "last_name": owner.last_name,
-        "patronymic": owner.patronymic,
-        "address": owner.address,
-        "gender": owner.gender,
-        "date_birth": owner.date_birth.isoformat() if owner.date_birth else None,
-        "created_at": owner.created_at.isoformat(),
-    }
 
-    return deleted_owner_data
+    dict = result.to_dict()
 
-async def update_owner(updated_data: OwnerUpdateAttributes, db: AsyncSession):
-    query = update(OwnerTable).where(OwnerTable.id == updated_data.id).values(**updated_data.dict(exclude_unset=True))
-    await db.execute(query)
-    await db.commit()
-    updated_owner_result = await db.execute(select(OwnerTable).filter_by(id=updated_data.id))
-    updated_owner = updated_owner_result.scalars().first()
-    updated_owner_data = {
-        "id": updated_owner.id,
-        "first_name": updated_owner.first_name,
-        "last_name": updated_owner.last_name,
-        "patronymic": updated_owner.patronymic,
-        "address": updated_owner.address,
-        "gender": updated_owner.gender,
-        "date_birth": updated_owner.date_birth.isoformat() if updated_owner.date_birth else None,
-        "created_at": updated_owner.created_at.isoformat(),
-    }
-    return updated_owner_data
+    return dict
+
+async def update_owner(record: OwnerUpdateAttributes, db: AsyncSession):
+    try:
+        # Обновляем запись
+        query = update(OwnerTable).where(OwnerTable.id == record.id).values(
+            **record.dict(exclude_unset=True)
+        )
+
+        await db.execute(query)
+
+        await db.commit()
+
+        # Извлекаем обновленную запись
+        result = await db.execute(select(OwnerTable).where(OwnerTable.id == record.id))
+        result = result.scalars().first()
+
+        dict = result.to_dict()
+
+        return dict if result else None
+
+    except Exception as e:
+        await db.rollback()
+        raise e

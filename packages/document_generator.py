@@ -10,6 +10,7 @@ from models.directories.owner import OwnerTable
 from models.directories.patient import PatientTable
 from models.med.primary_visit import PrimaryVisitTable
 from models.med.repeat_visit import RepeatVisitTable
+from schemas.directories.owner import OwnerAgreementSignPD
 
 from utils.responses import Http400, create_http_response
 
@@ -82,22 +83,13 @@ async def get_document_repeat_visit(db: AsyncSession, repeat_visit_id: int):
         media_type='application/pdf'  # Измените на pdf
     )
 
-async def get_consent_processing_personal_data(db: AsyncSession, owner_id: int = None):
-    if owner_id is not None:
-        query = await (
-            db.execute(
-                select(OwnerTable)
-
-                .filter_by(id=owner_id)
-            )
-        )
-        owner_document = query.scalars().first().to_dict_for_document()
-
-    docx_path = f"resources/{owner_document['owner']}_согласие.docx"
-    pdf_path = f"resources/{owner_document['owner']}_согласие.pdf"
+async def get_pd_agreement_sign(db: AsyncSession, record: OwnerAgreementSignPD):
+    record = record.to_dict()
+    docx_path = f"resources/{ record['last_name'] + record['first_name'] + record['patronymic'] }_согласие.docx"
+    pdf_path = f"resources/{ record['last_name'] + record['first_name'] + record['patronymic']}_согласие.pdf"
 
     doc = DocxTemplate("resources/СНоПД.docx")
-    doc.render(owner_document)
+    doc.render(record)
     doc.save(docx_path)
 
     # Конвертация в PDF
@@ -105,6 +97,6 @@ async def get_consent_processing_personal_data(db: AsyncSession, owner_id: int =
 
     return FileResponse(
         path=pdf_path,
-        filename=owner_document['owner'] + "_согласие.pdf",
+        filename=record['last_name'] + record['first_name'] + record['patronymic'] + "_согласие.pdf",
         media_type='application/pdf'
     )
