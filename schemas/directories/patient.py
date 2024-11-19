@@ -2,8 +2,8 @@ from typing import Optional
 from fastapi import HTTPException
 from pydantic import BaseModel, Field, root_validator
 
+"""Схема записи пациента, для INSERT(создания)"""
 class PatientInsertAttributes(BaseModel):
-    """Атрибуты для вставки животных"""
     nickname: str = Field(..., min_length=1, max_length=255, description="Кличка животного")
     animal_type_id: int = Field(..., description="Идентификатор типа животного")
     breed_id: int = Field(..., description="Идентификатор породы")
@@ -14,6 +14,7 @@ class PatientInsertAttributes(BaseModel):
     @root_validator(pre=True)
     def pre_validator(cls, values):
         keys = values.keys()
+
         if "nickname" not in keys or not values.get("nickname"):
             raise HTTPException(status_code=400, detail="Не указана кличка")
         if "animal_type_id" not in keys or not values.get("animal_type_id"):
@@ -28,8 +29,8 @@ class PatientInsertAttributes(BaseModel):
             raise HTTPException(status_code=400, detail="Неверное значение пола животного")
         return values
 
+"""Схема записи пациента, для UPDATE(обновления)"""
 class PatientUpdateAttributes(BaseModel):
-    """Атрибуты для обновления животных"""
     id: int = Field(..., description="Идентификатор животного")
     nickname: Optional[str] = Field(None, min_length=1, max_length=255, description="Кличка животного")
     animal_type_id: Optional[int] = Field(None, description="Идентификатор типа животного")
@@ -41,6 +42,7 @@ class PatientUpdateAttributes(BaseModel):
     @root_validator(pre=True)
     def pre_validator(cls, values):
         keys = values.keys()
+
         if "id" not in keys or not values.get("id"):
             raise HTTPException(status_code=400, detail="Не указан идентификатор животного")
         if "animal_type_id" in keys or values.get("animal_type_id"):

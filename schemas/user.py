@@ -17,8 +17,8 @@ class User(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    login: str = Field(..., description="Логин пользователя")
-    password: str = Field(..., description="Пароль пользователя")
+    login: str = Field(..., description="Логин пользователя", validate_default=True)
+    password: str = Field(..., description="Пароль пользователя", validate_default=True)
 
     @root_validator(pre=True)
     def validate_login_password(cls, values):

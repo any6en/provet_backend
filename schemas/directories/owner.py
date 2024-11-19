@@ -7,14 +7,7 @@ from pydantic import BaseModel, root_validator
 
 from utils.date_formatter import format_date_dmy_dt
 
-'''Функциональность модуля
-
-1. Схема-модель Pydantic для добавления записи
-2. Схема-модель Pydantic для изменения записи
-3. Схема-модель Pydantic для печати договора об соглашении на обработку персональных данных
-'''
-
-# Схема-модель Pydantic для добавления записи
+"""Схема записи владельца, для INSERT(создания)"""
 class OwnerInsertAttributes(BaseModel):
     first_name: str = Field(..., min_length=1, max_length=255, description="Имя", validate_default=True)
     last_name: str = Field(..., min_length=1, max_length=255, description="Фамилия", validate_default=True)
@@ -34,43 +27,27 @@ class OwnerInsertAttributes(BaseModel):
     date_pd_agreement_sign: Optional[datetime] = Field(None,
             description="Дата подписания договора об соглашении на обработку персональных данных")
 
-    # Валидатор обязательных полей для добавления записи
     @root_validator(pre=True)
     def pre_validator(cls, values):
         keys = values.keys()
+
         if "first_name" not in keys or not values.get("first_name"):
-            raise HTTPException(
-                status_code=400,
-                detail="Не указано имя"
-            )
+            raise HTTPException(status_code=400, detail="Не указано имя")
         if "last_name" not in keys or not values.get("last_name"):
-            raise HTTPException(
-                status_code=400,
-                detail="Не указана фамилия"
-            )
+            raise HTTPException(status_code=400, detail="Не указана фамилия")
         if "patronymic" not in keys or not values.get("patronymic"):
-            raise HTTPException(
-                status_code=400,
-                detail="Не указано отчество"
-            )
+            raise HTTPException(status_code=400, detail="Не указано отчество")
         if "gender" not in keys or not values.get("gender"):
-            raise HTTPException(
-                status_code=400,
-                detail="Не указан пол"
-            )
+            raise HTTPException( status_code=400, detail="Не указан пол")
         if "pd_agreement_signed" not in keys:
-            raise HTTPException(
-                status_code=400,
-                detail="Не указано подписан ли договор об согласии на обработку персональных данных"
-            )
+            raise HTTPException(status_code=400, detail="Не указано подписан ли договор СнОПД")
         return values
 
     class Config:
         from_attributes = True
 
-# Схема-модель Pydantic для изменения записи
+"""Схема записи владельца, для UPDATE(обновления)"""
 class OwnerUpdateAttributes(BaseModel):
-    """Атрибуты владельцев"""
     id: int = Field(..., description="Идентификатор")
 
     first_name: Optional[str] = Field(None, min_length=1, max_length=255,
@@ -95,42 +72,15 @@ class OwnerUpdateAttributes(BaseModel):
     pd_agreement_signed: bool = Field(...,
             description="Подписан ли договор об согласии на обработку персональных данных", validate_default=True)
 
-    # Валидатор обязательных полей для изменения записи
     @root_validator(pre=True)
     def pre_validator(cls, values):
         keys = values.keys()
-        if "first_name" not in keys or not values.get("first_name"):
-            raise HTTPException(
-                status_code=400,
-                detail="Не указано имя"
-            )
-        if "last_name" not in keys or not values.get("last_name"):
-            raise HTTPException(
-                status_code=400,
-                detail="Не указана фамилия"
-            )
-        if "patronymic" not in keys or not values.get("patronymic"):
-            raise HTTPException(
-                status_code=400,
-                detail="Не указано отчество"
-            )
-        if "gender" not in keys or not values.get("gender"):
-            raise HTTPException(
-                status_code=400,
-                detail="Не указан пол"
-            )
-        if "pd_agreement_signed" not in keys:
-            raise HTTPException(
-                status_code=400,
-                detail="Не указано подписан ли договор об соглашении на обработку персональных данных"
-            )
+
+        if "id" not in keys or not values.get("id"):
+            raise HTTPException(status_code=400, detail="Не указан идентификатор")
         return values
 
-
-from pydantic import BaseModel, Field
-
-
-# Схема-модель Pydantic для печати договора об соглашении на обработку персональных данных
+"""Схема записи владельца договора об согласии на обработку персональных данных"""
 class OwnerAgreementSignPD(BaseModel):  # Inherit from BaseModel
     first_name: str = Field(..., min_length=1, max_length=255, description="Имя")
     last_name: str = Field(..., min_length=1, max_length=255, description="Фамилия")
@@ -144,10 +94,10 @@ class OwnerAgreementSignPD(BaseModel):  # Inherit from BaseModel
             description="Код подразделения выдачи паспорта")
     issue_date: Optional[datetime] = Field(..., description="Дата выдачи паспорта")
 
-    # Валидатор обязательных полей для печати договора
     @root_validator(pre=True)
     def pre_validator(cls, values):
         keys = values.keys()
+
         if "first_name" not in keys or not values.get("first_name"):
             raise HTTPException(status_code=400, detail="Не указано имя")
         if "last_name" not in keys or not values.get("last_name"):

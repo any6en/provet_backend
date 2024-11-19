@@ -4,8 +4,8 @@ from datetime import datetime
 from pydantic import BaseModel, Field, root_validator
 from fastapi import HTTPException
 
+"""Схема записи первичного приема, для INSERT(создания)"""
 class PrimaryVisitInsertAttributes(BaseModel):
-    """Атрибуты первичного посещения"""
     user_id: int = Field(..., description="Идентификатор врача", gt=0)
     owner_id: int = Field(..., description="Идентификатор владельца", gt=0)
     patient_id: int = Field(..., description="Идентификатор пациента", gt=0)
@@ -29,7 +29,6 @@ class PrimaryVisitInsertAttributes(BaseModel):
                     values["weight"] = float(weight)  # Пытаемся конвертировать в float
                 except (ValueError, TypeError):
                     raise HTTPException(status_code=400, detail="Вес должен быть числом")
-
         if "user_id" not in keys or values.get("user_id") is None:
             raise HTTPException(status_code=400, detail="Не указан идентификатор врача")
         if "owner_id" not in keys or values.get("owner_id") is None:
@@ -51,9 +50,8 @@ class PrimaryVisitInsertAttributes(BaseModel):
 
         return values
 
-
+"""Схема записи первичного приема, для UPDATE(обновления)"""
 class PrimaryVisitUpdateAttributes(BaseModel):
-    """Атрибуты первичного посещения для обновления"""
     id: int = Field(..., description="Идентификатор записи о посещении")
 
     user_id: Optional[int] = Field(None, description="Идентификатор врача")
@@ -72,6 +70,8 @@ class PrimaryVisitUpdateAttributes(BaseModel):
     @root_validator(pre=True)
     def pre_validator(cls, values):
         keys = values.keys()
+        if "id" not in keys or values.get("id") is None:
+            raise HTTPException(status_code=400, detail="Не указан идентификатор записи")
 
         weight = values.get("weight")
         if weight is not None:
@@ -80,15 +80,6 @@ class PrimaryVisitUpdateAttributes(BaseModel):
                     values["weight"] = float(weight)  # Пытаемся конвертировать в float
                 except (ValueError, TypeError):
                     raise HTTPException(status_code=400, detail="Вес должен быть числом")
-        # Проверяем, что хотя бы одно поле для обновления указано
-        if all(key not in keys for key in
-               ["user_id", "owner_id", "patient_id", "disease_onset_date", "anamnesis", "examination",
-                "prelim_diagnosis", "confirmed_diagnosis", "result", "date_visit"]):
-            raise HTTPException(
-                status_code=400,
-                detail="Не указаны данные для обновления"
-            )
-
         return values
 
     class Config:
