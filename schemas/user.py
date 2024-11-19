@@ -1,6 +1,5 @@
 from fastapi import HTTPException
 from pydantic import BaseModel, root_validator, Field
-import logging
 
 
 class User(BaseModel):
@@ -18,16 +17,15 @@ class User(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    login: str = Field(..., description="Логин")
-    password: str = Field(..., description="Пароль")
-    logging.error(login)
-    logging.error(password)
+    login: str = Field(..., description="Логин пользователя")
+    password: str = Field(..., description="Пароль пользователя")
 
     @root_validator(pre=True)
-    def validate_ids(cls, values):
+    def validate_login_password(cls, values):
         keys = values.keys()
 
         if "login" not in keys or values.get("login") is None:
             raise HTTPException(status_code=400, detail="Не указан логин")
         if "password" not in keys or values.get("password") is None:
             raise HTTPException(status_code=400, detail="Не указан пароль")
+        return values
