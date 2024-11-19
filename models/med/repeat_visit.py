@@ -1,43 +1,32 @@
-from datetime import datetime
-
 from sqlalchemy import Column, Integer, Date, DateTime, Text, ForeignKey, DECIMAL
 from sqlalchemy.orm import relationship
 from models.model import Base
 from utils.utils import calculate_age
 
-
+'''Модель таблицы повторный приемов в базе данных'''
 class RepeatVisitTable(Base):
     __tablename__ = "repeat_visits"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)  # Ссылка на врача
-    owner_id = Column(Integer, ForeignKey('owners.id'), nullable=False)  # Ссылка на владельца
-    patient_id = Column(Integer, ForeignKey('patients.id'), nullable=False)  # Ссылка на пациента
-    primary_visit_id = Column(Integer, ForeignKey('primary_visits.id'), nullable=False)  # Ссылка на первичное посещение
-    disease_onset_date = Column(Date, nullable=False)  # Дата возникновения болезни
-    anamnesis = Column(Text, nullable=False)  # Анамнез
-    examination = Column(Text, nullable=False)  # Обследование
-    prelim_diagnosis = Column(Text, nullable=False)  # Предварительный диагноз
-    confirmed_diagnosis = Column(Text, nullable=False)  # Подтвержденный диагноз
-    result = Column(Text, nullable=False)  # Результат
-    date_visit = Column(DateTime, nullable=False)  # Дата посещения
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    owner_id = Column(Integer, ForeignKey('owners.id'), nullable=False)
+    patient_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+    primary_visit_id = Column(Integer, ForeignKey('primary_visits.id'), nullable=False)
+    disease_onset_date = Column(Date, nullable=False)
+    anamnesis = Column(Text, nullable=False)
+    examination = Column(Text, nullable=False)
+    prelim_diagnosis = Column(Text, nullable=False)
+    confirmed_diagnosis = Column(Text, nullable=False)
+    result = Column(Text, nullable=False)
+    date_visit = Column(DateTime, nullable=False)
     weight = Column(Integer, nullable=True)
 
-    # Опциональные связи
     user = relationship("UserTable")  # Связь с врачом
     owner = relationship("OwnerTable")  # Связь с владельцем
     patient = relationship("PatientTable")  # Связь с пациентом
-    primary_visit = relationship("PrimaryVisitTable")  # Связь с первичным посещением
+    primary_visit = relationship("PrimaryVisitTable")  # Связь с первичным приемом
 
-    def to_dict_journal(self):
-        return {
-            'id': self.id,
-            'date_visit': self.date_visit.isoformat() if self.date_visit else None,
-            'content': "Повторный прием",
-            "doctor_full_name": self.user.last_name + " " + self.user.first_name[0] + ". " + self.user.patronymic[0] + ".",
-            "primary_visit_id": self.primary_visit_id
-        }
-
+    '''Метод для приведения объекта в словарь'''
     def to_dict(self):
         return {
             'id': self.id,
@@ -55,6 +44,17 @@ class RepeatVisitTable(Base):
             'weight': float(self.weight) if self.weight else None
         }
 
+    '''Метод для приведения объекта в словарь (используется для журнала посещений)'''
+    def to_dict_journal(self):
+        return {
+            'id': self.id,
+            'date_visit': self.date_visit.isoformat() if self.date_visit else None,
+            'content': "Повторный прием",
+            "doctor_full_name": self.user.last_name + " " + self.user.first_name[0] + ". " + self.user.patronymic[0] + ".",
+            "primary_visit_id": self.primary_visit_id
+        }
+
+    '''Метод для приведения объекта в словарь (используется в открытии сессии приемов)'''
     def to_dict_visits(self):
         return {
             'id': self.id,
@@ -79,6 +79,7 @@ class RepeatVisitTable(Base):
             'doctor_full_name': self.user.last_name + " " + self.user.first_name + " " + self.user.patronymic,
         }
 
+    '''Метод для приведения объекта в словарь (используется при генерации листа повторного приема)'''
     def to_dict_for_document(self):
         return {
             'id': self.id,

@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from models.model import Base
 
 
+'''Модель таблицы пород пациентов в базе данных'''
 class BreedTable(Base):
     __tablename__ = "breeds"
 
@@ -12,6 +13,7 @@ class BreedTable(Base):
 
     animal_type = relationship("AnimalTypeTable", back_populates="breeds")
 
+    '''Метод для приведения объекта в словарь'''
     def to_dict(self):
         return {
             "id": self.id,
@@ -19,6 +21,7 @@ class BreedTable(Base):
             "animal_type_id": self.animal_type_id,
         }
 
+    '''Метод для приведения объекта в словарь + название типа'''
     def to_dict_full(self):
         return {
             "id": self.id,

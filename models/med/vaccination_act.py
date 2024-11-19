@@ -2,24 +2,25 @@ from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import relationship
 from models.model import Base
 
-
+'''Модель таблицы актов вакцинации в базе данных'''
 class VaccinationActTable(Base):
     __tablename__ = "vaccination_acts"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)  # Ссылка на врача
-    owner_id = Column(Integer, ForeignKey('owners.id'), nullable=False)  # Ссылка на владельца
-    patient_id = Column(Integer, ForeignKey('patients.id'), nullable=False)  # Ссылка на пациента
-    vaccine = Column(String(255), nullable=False)  # Вакцина
-    vaccination_date = Column(Date, nullable=False)  # Дата вакцинации
-    revaccination_date = Column(Date, nullable=True)  # Дата ревакцинации
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    owner_id = Column(Integer, ForeignKey('owners.id'), nullable=False)
+    patient_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+    vaccine = Column(String(255), nullable=False)
+    vaccination_date = Column(Date, nullable=False)
+    revaccination_date = Column(Date, nullable=True)
     weight = Column(Integer, nullable=True)
 
     # Опциональные связи (если нужно)
-    user = relationship("UserTable")  # Предполагая, что у вас есть модель User
-    owner = relationship("OwnerTable")  # Предполагая, что у вас есть модель Owner
-    patient = relationship("PatientTable")  # Предполагая, что у вас есть модель Patient
+    user = relationship("UserTable")  # Связь с врачом
+    owner = relationship("OwnerTable")  # Связь с владельцем
+    patient = relationship("PatientTable")  # Связь с пациентом
 
+    '''Метод для приведения объекта в словарь (используется для журнала посещений)'''
     def to_dict_journal(self):
         return {
             'id': self.id,

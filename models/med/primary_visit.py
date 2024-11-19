@@ -5,21 +5,21 @@ from sqlalchemy.orm import relationship
 from models.model import Base
 from utils.utils import calculate_age
 
-
+'''Модель таблицы первичных приемов в базе данных'''
 class PrimaryVisitTable(Base):
     __tablename__ = "primary_visits"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)  # Ссылка на врача
-    owner_id = Column(Integer, ForeignKey('owners.id'), nullable=False)  # Ссылка на владельца
-    patient_id = Column(Integer, ForeignKey('patients.id'), nullable=False)  # Ссылка на пациента
-    disease_onset_date = Column(Date, nullable=False)  # Дата возникновения болезни
-    anamnesis = Column(Text, nullable=False)  # Анамнез
-    examination = Column(Text, nullable=False)  # Обследование
-    prelim_diagnosis = Column(Text, nullable=False)  # Предварительный диагноз
-    confirmed_diagnosis = Column(Text, nullable=False)  # Подтвержденный диагноз
-    result = Column(Text, nullable=False)  # Результат
-    date_visit = Column(DateTime, nullable=False)  # Дата посещения
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    owner_id = Column(Integer, ForeignKey('owners.id'), nullable=False)
+    patient_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+    disease_onset_date = Column(Date, nullable=False)
+    anamnesis = Column(Text, nullable=False)
+    examination = Column(Text, nullable=False)
+    prelim_diagnosis = Column(Text, nullable=False)
+    confirmed_diagnosis = Column(Text, nullable=False)
+    result = Column(Text, nullable=False)
+    date_visit = Column(DateTime, nullable=False)
     weight = Column(Integer, nullable=True)
 
     # Опциональные связи (если нужно)
@@ -27,6 +27,7 @@ class PrimaryVisitTable(Base):
     owner = relationship("OwnerTable")
     patient = relationship("PatientTable")
 
+    '''Метод для приведения объекта в словарь'''
     def to_dict(self):
         return {
             'id': self.id,
@@ -43,6 +44,7 @@ class PrimaryVisitTable(Base):
             'weight': float(self.weight) if self.weight else None
         }
 
+    '''Метод для приведения объекта в словарь (используется для журнала посещений)'''
     def to_dict_journal(self):
         return {
             'id': self.id,
@@ -53,6 +55,7 @@ class PrimaryVisitTable(Base):
             "subRows": []
         }
 
+    '''Метод для приведения объекта в словарь (используется при генерации листа первичного приема)'''
     def to_dict_for_document(self):
         return {
             'id': self.id,
@@ -72,6 +75,7 @@ class PrimaryVisitTable(Base):
             'weight': float(self.weight) if self.weight else None
         }
 
+    '''Метод для приведения объекта в словарь (используется в открытии сессии приемов)'''
     def to_dict_visits(self):
         return {
             'id': self.id,

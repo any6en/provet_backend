@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Date, DateTime
 from models.model import Base
 
+'''Модель таблицы владельцов в базе данных'''
 class OwnerTable(Base):
     __tablename__ = "owners"
     # Основные данные
@@ -22,6 +23,7 @@ class OwnerTable(Base):
     pd_agreement_signed = Column(String(255), nullable=False)
     date_pd_agreement_sign = Column(Date, nullable=False)
 
+    '''Метод для приведения объекта в словарь'''
     def to_dict(self):
         return {
             'id': self.id,
@@ -39,11 +41,4 @@ class OwnerTable(Base):
             'issue_date': self.issue_date.isoformat() if self.issue_date else None,
             'pd_agreement_signed': self.pd_agreement_signed if self.pd_agreement_signed else None,
             'date_pd_agreement_sign': self.pd_agreement_signed if self.pd_agreement_signed else None
-        }
-
-    def to_dict_for_document(self):
-        return {
-            'id': self.id,
-            'owner': self.last_name + " " + self.first_name + " " + self.patronymic,
-            'address': self.last_name + " " + self.first_name + " " + self.patronymic,
         }

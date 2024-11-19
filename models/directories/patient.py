@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from models.model import Base
 from utils.utils import calculate_age
 
-
+'''Модель таблицы пациентов в базе данных'''
 class PatientTable(Base):
     __tablename__ = "patients"
 
@@ -18,11 +18,24 @@ class PatientTable(Base):
     gender = Column(Integer, nullable=False)
     created_at = Column(DateTime, nullable=False)
 
-    # Определяем отношения с другими таблицами
-    animal_type = relationship("AnimalTypeTable")
-    breed = relationship("BreedTable")
-    owner = relationship("OwnerTable")
+    animal_type = relationship("AnimalTypeTable") # Связь с типом
+    breed = relationship("BreedTable") # Связь с породой
+    owner = relationship("OwnerTable") # Связь с владельцом
 
+    '''Метод для приведения объекта в словарь'''
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "nickname": self.nickname,
+            "animal_type_id": self.animal_type_id,
+            "breed_id": self.breed_id,
+            "owner_id": self.owner_id,
+            "date_birth": self.date_birth,
+            "gender": self.gender,
+            "created_at": self.created_at,
+        }
+
+    '''Метод для приведения объекта в словарь (используется для справочника)'''
     def to_dict_page(self):
         return {
             "id": self.id,
@@ -37,6 +50,7 @@ class PatientTable(Base):
             "breed_name": self.breed.name,
         }
 
+    '''Метод для приведения объекта в словарь (используется для быстрого поиска)'''
     def to_dict_fast_search(self):
         return {
             "id": self.id,
@@ -47,18 +61,9 @@ class PatientTable(Base):
             "owner_fullname": self.owner.name + " " + self.owner.last_name + " " + self.owner.patronymic,
         }
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "nickname": self.nickname,
-            "animal_type_id": self.animal_type_id,
-            "breed_id": self.breed_id,
-            "owner_id": self.owner_id,
-            "date_birth": self.date_birth,
-            "gender": self.gender,
-            "created_at": self.created_at,
-        }
 
+
+    '''Метод для приведения объекта в словарь (используется для получения доп. информации в свойствах)'''
     def to_dict_info(self):
         return {
             "id": self.id,

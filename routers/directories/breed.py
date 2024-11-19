@@ -15,7 +15,6 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-
 @worker.get("/breeds", description="Получение списка записей")
 async def get_route(id: int = None, db: AsyncSession = Depends(get_db)):
     records = await get_breeds(db, id)
