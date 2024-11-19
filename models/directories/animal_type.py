@@ -9,7 +9,6 @@ class AnimalTypeTable(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), unique=True, nullable=False)
 
-    # Отношение один-ко-многим
     breeds = relationship("BreedTable", back_populates="animal_type")
 
     '''Метод для приведения объекта в словарь'''
@@ -18,5 +17,3 @@ class AnimalTypeTable(Base):
             "id": self.id,
             "name": self.name,
         }
-
-
