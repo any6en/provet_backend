@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime
+from sqlalchemy import Column, Integer, String, Date, DateTime, Boolean
 from models.model import Base
 
 '''Модель таблицы владельцов в базе данных'''
@@ -19,9 +19,9 @@ class OwnerTable(Base):
     passport_number = Column(String(255), nullable=True)
     issued_by = Column(String(255), nullable=True)
     subdivision_code = Column(String(255), nullable=True)
-    issue_date = Column(Date)
-    pd_agreement_signed = Column(String(255), nullable=False)
-    date_pd_agreement_sign = Column(Date, nullable=False)
+    issue_date = Column(Date, nullable=True)
+    pd_agreement_signed = Column(Boolean, nullable=False)
+    date_pd_agreement_sign = Column(Date, nullable=True)
 
     '''Метод для приведения объекта в словарь'''
     def to_dict(self):
@@ -30,15 +30,16 @@ class OwnerTable(Base):
             'first_name': self.first_name,
             'last_name': self.last_name,
             'patronymic': self.patronymic,
-            'address': self.address if self.address else None,
+            'address': self.address,
             'date_birth': self.date_birth.isoformat() if self.date_birth else None,
             'gender': self.gender,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'passport_series': self.passport_series if self.passport_series else None,
-            'passport_number': self.passport_number if self.passport_number else None,
-            'issued_by': self.issued_by if self.issued_by else None,
-            'subdivision_code': self.subdivision_code if self.subdivision_code else None,
+            'created_at': self.created_at.isoformat(),
+            'passport_series': self.passport_series,
+            'passport_number': self.passport_number,
+            'issued_by': self.issued_by,
+            'subdivision_code': self.subdivision_code ,
             'issue_date': self.issue_date.isoformat() if self.issue_date else None,
-            'pd_agreement_signed': self.pd_agreement_signed if self.pd_agreement_signed else None,
-            'date_pd_agreement_sign': self.pd_agreement_signed if self.pd_agreement_signed else None
+            'pd_agreement_signed': self.pd_agreement_signed,
+            'date_pd_agreement_sign': self.date_pd_agreement_sign.isoformat()
+                if self.date_pd_agreement_sign else None
         }

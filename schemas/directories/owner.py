@@ -39,8 +39,10 @@ class OwnerInsertAttributes(BaseModel):
             raise HTTPException(status_code=400, detail="Не указано отчество")
         if "gender" not in keys or not values.get("gender"):
             raise HTTPException( status_code=400, detail="Не указан пол")
-        if "pd_agreement_signed" not in keys:
+        if "pd_agreement_signed" not in keys or values.get("pd_agreement_signed"):
             raise HTTPException(status_code=400, detail="Не указано подписан ли договор СнОПД")
+        if "date_pd_agreement_sign" not in keys or values.get("date_pd_agreement_sign"):
+            raise HTTPException(status_code=400, detail="Не указана дата подписи договора СнОПД")
         return values
 
     class Config:
@@ -70,7 +72,9 @@ class OwnerUpdateAttributes(BaseModel):
                                             description="Код подразделения выдачи паспорта")
     issue_date: Optional[datetime] = Field(None, description="Дата рождения")
     pd_agreement_signed: bool = Field(...,
-            description="Подписан ли договор об согласии на обработку персональных данных", validate_default=True)
+        description="Подписан ли договор об согласии на обработку персональных данных", validate_default=True)
+    date_pd_agreement_sign: Optional[datetime] = Field(None,
+        description="Дата подписания договора об соглашении на обработку персональных данных")
 
     @root_validator(pre=True)
     def pre_validator(cls, values):

@@ -31,6 +31,3 @@ def format_date_dmy_dt(date_string: str, is_need_time: bool = False, is_month_tr
     # Если нужно только дату
     return formatted_date
 
-
-# Пример использования
-print(format_date_dmy_dt("2022-03-15T14:30:00", is_need_time=True, is_month_translate=True))
