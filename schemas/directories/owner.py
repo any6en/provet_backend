@@ -6,6 +6,7 @@ from datetime import datetime
 from pydantic import BaseModel, root_validator
 
 from utils.date_formatter import format_date_dmy_dt
+import logging
 
 """Схема записи владельца, для INSERT(создания)"""
 class OwnerInsertAttributes(BaseModel):
@@ -39,10 +40,13 @@ class OwnerInsertAttributes(BaseModel):
             raise HTTPException(status_code=400, detail="Не указано отчество")
         if "gender" not in keys or not values.get("gender"):
             raise HTTPException( status_code=400, detail="Не указан пол")
-        if "pd_agreement_signed" not in keys or values.get("pd_agreement_signed"):
+        if "pd_agreement_signed" not in keys:
             raise HTTPException(status_code=400, detail="Не указано подписан ли договор СнОПД")
-        if "date_pd_agreement_sign" not in keys or values.get("date_pd_agreement_sign"):
-            raise HTTPException(status_code=400, detail="Не указана дата подписи договора СнОПД")
+
+        if values.get("pd_agreement_signed"):
+            if "date_pd_agreement_sign" not in keys or not values.get("date_pd_agreement_sign"):
+                raise HTTPException(status_code=400, detail="Не указана дата подписи договора СнОПД")
+
         return values
 
     class Config:
@@ -85,7 +89,7 @@ class OwnerUpdateAttributes(BaseModel):
         return values
 
 """Схема записи владельца договора об согласии на обработку персональных данных"""
-class OwnerAgreementSignPD(BaseModel):  # Inherit from BaseModel
+class OwnerAgreementSignPD(BaseModel):
     first_name: str = Field(..., min_length=1, max_length=255, description="Имя")
     last_name: str = Field(..., min_length=1, max_length=255, description="Фамилия")
     patronymic: str = Field(..., min_length=1, max_length=255, description="Отчество")
