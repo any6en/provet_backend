@@ -6,7 +6,6 @@ from datetime import datetime
 from pydantic import BaseModel, root_validator
 
 from utils.date_formatter import format_date_dmy_dt
-import logging
 
 """Схема записи владельца, для INSERT(создания)"""
 class OwnerInsertAttributes(BaseModel):
