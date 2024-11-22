@@ -137,6 +137,6 @@ class OwnerAgreementSignPD(BaseModel):
             'passport_number': self.passport_number,
             'issued_by': self.issued_by,
             'subdivision_code': self.subdivision_code,
-            'issue_date': self.issue_date.isoformat(),
+            'issue_date': format_date_dmy_dt(self.issue_date.isoformat(), False, True),
             'date_sign': format_date_dmy_dt(datetime.now().isoformat(), False, True)
         }

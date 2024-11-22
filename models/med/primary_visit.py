@@ -62,6 +62,7 @@ class PrimaryVisitTable(Base):
             'doctor': self.user.last_name + " " + self.user.first_name[0] + ". " + self.user.patronymic[0] + ".",
             'owner': self.owner.last_name + " " + self.owner.first_name + ". " + self.owner.patronymic,
             'breed': self.patient.breed.name,
+            'animal_type': self.patient.animal_type.name,
             'nickname': self.patient.nickname,
             'age': calculate_age(self.date_visit, self.patient.date_birth),
             'gender': "Самец" if self.patient.gender == 1 else "Самка" if self.patient.gender == 2 else "Не указано",

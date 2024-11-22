@@ -21,7 +21,8 @@ async def get_document_primary_visit(db: AsyncSession, primary_visit_id: int):
         .options(
             selectinload(PrimaryVisitTable.user),
             selectinload(PrimaryVisitTable.owner),
-            selectinload(PrimaryVisitTable.patient).selectinload(PatientTable.breed)
+            selectinload(PrimaryVisitTable.patient).selectinload(PatientTable.breed),
+            selectinload(PrimaryVisitTable.patient).selectinload(PatientTable.animal_type)
         )
         .filter_by(id=primary_visit_id)
     )
@@ -55,8 +56,9 @@ async def get_document_repeat_visit(db: AsyncSession, repeat_visit_id: int):
         .options(
             selectinload(RepeatVisitTable.user),
             selectinload(RepeatVisitTable.owner),
-            selectinload(RepeatVisitTable.patient).selectinload(PatientTable.breed)
-        )
+            selectinload(RepeatVisitTable.patient).selectinload(PatientTable.breed),
+            selectinload(RepeatVisitTable.patient).selectinload(PatientTable.animal_type)
+    )
         .filter_by(id=repeat_visit_id)
     )
 
