@@ -19,17 +19,7 @@ async def get_patients(db: AsyncSession, id: int = None, owner_id: int = None):
 
         result = []
         for row in rows:
-            dict = row.to_dict_page()
-
-            date_birth = dict.get('date_birth')
-            if date_birth is not None:
-                dict['date_birth'] = date_birth.isoformat()
-
-            created_at = dict.get('created_at')
-            if created_at is not None:
-                dict['created_at'] = created_at.isoformat()
-
-            result.append(dict)
+            result.append(row.to_dict_page())
         return result
 
     if id is None:
@@ -40,17 +30,7 @@ async def get_patients(db: AsyncSession, id: int = None, owner_id: int = None):
 
         result = []
         for row in rows:
-            dict = row.to_dict_page()
-
-            date_birth = dict.get('date_birth')
-            if date_birth is not None:
-                dict['date_birth'] = date_birth.isoformat()
-
-            created_at = dict.get('created_at')
-            if created_at is not None:
-                dict['created_at'] = created_at.isoformat()
-
-            result.append(dict)
+            result.append(row.to_dict_page())
         return result
 
     query = await db.execute(
@@ -58,17 +38,7 @@ async def get_patients(db: AsyncSession, id: int = None, owner_id: int = None):
     )
     result = query.scalars().first()
 
-    dict = result.to_dict_page()
-
-    date_birth = dict.get('date_birth')
-    if date_birth is not None:
-        dict['date_birth'] = date_birth.isoformat()
-
-    created_at = dict.get('created_at')
-    if created_at is not None:
-        dict['created_at'] = created_at.isoformat()
-
-    return dict if result else None
+    return result.to_dict_page() if result else None
 
 
 async def create_patient(record: PatientInsertAttributes, db: AsyncSession):
@@ -84,17 +54,7 @@ async def create_patient(record: PatientInsertAttributes, db: AsyncSession):
     result = await db.execute(select(PatientTable).filter_by(id=query.inserted_primary_key[0]))
     result = result.scalars().first()
 
-    dict = result.to_dict()
-
-    date_birth = dict.get('date_birth')
-    if date_birth is not None:
-        dict['date_birth'] = date_birth.isoformat()
-
-    created_at = dict.get('created_at')
-    if created_at is not None:
-        dict['created_at'] = created_at.isoformat()
-
-    return dict
+    return result.to_dict()
 
 
 async def delete_patient(id: int, db: AsyncSession):
@@ -110,18 +70,8 @@ async def delete_patient(id: int, db: AsyncSession):
     await db.delete(result)
     await db.commit()
 
-    dict = result.to_dict()
-
-    date_birth = dict.get('date_birth')
-    if date_birth is not None:
-        dict['date_birth'] = date_birth.isoformat()
-
-    created_at = dict.get('created_at')
-    if created_at is not None:
-        dict['created_at'] = created_at.isoformat()
-
     # Возвращаем обновленный объект в виде словаря
-    return dict if result else None
+    return result.to_dict() if result else None
 
 
 async def update_patient(record: PatientUpdateAttributes, db: AsyncSession):
@@ -139,18 +89,8 @@ async def update_patient(record: PatientUpdateAttributes, db: AsyncSession):
         result = await db.execute(select(PatientTable).where(PatientTable.id == record.id))
         result = result.scalars().first()
 
-        dict = result.to_dict()
-
-        date_birth = dict.get('date_birth')
-        if date_birth is not None:
-            dict['date_birth'] = date_birth.isoformat()
-
-        created_at = dict.get('created_at')
-        if created_at is not None:
-            dict['created_at'] = created_at.isoformat()
-
         # Возвращаем обновленный объект в виде словаря
-        return dict if result else None
+        return result.to_dict() if result else None
 
     except Exception as e:
         await db.rollback()  # Откат при ошибке

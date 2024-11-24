@@ -1,9 +1,33 @@
-from starlette.responses import PlainTextResponse
+from pydantic_i18n import PydanticI18n
+from fastapi import Request
+from fastapi.exceptions import RequestValidationError
 
 from utils.responses import Http400, Http500, Http404
+import logging
+
+all = ["get_locale", "validation_exception_handler"]
+
+DEFAULT_LOCALE = "ru_RU"  # Устанавливаем русский язык по умолчанию
+
+translations = {
+    "ru_RU": {
+        "Field required": "Поле обязательно для заполнения",
+    },
+    "en_US": {
+        "Field required": "Field required",
+    },
+    "de_DE": {
+        "Field required": "Feld erforderlich",
+    },
+}
+
+tr = PydanticI18n(translations)
+
+def get_locale(locale: str = DEFAULT_LOCALE) -> str:
+    return locale
 
 
-async def unicorn_exception_handler(request, exc):
+async def unicorn_exception_handler(request: Request, exc: RequestValidationError):
     """Отслеживание исключений HTTPException на уровне
     обработчиков роутов приложения FastAPI.
 
@@ -24,13 +48,21 @@ async def unicorn_exception_handler(request, exc):
 
     match exc.status_code:
         case 400:
-            return Http400(exc.detail).get_response()
+            current_locale = request.query_params.get("locale", DEFAULT_LOCALE)
+
+            return {"detail": tr.translate(exc.errors(), current_locale)}
         case 404:
-            return Http404().get_response()
+            current_locale = request.query_params.get("locale", DEFAULT_LOCALE)
+
+            return {"detail": tr.translate(exc.errors(), current_locale)}
         case 500:
-            return Http500(str(exc.detail)).get_response()
+            current_locale = request.query_params.get("locale", DEFAULT_LOCALE)
+
+            return {"detail": tr.translate(exc.errors(), current_locale)}
         case _:
-            return PlainTextResponse(status_code=exc.status_code, content=str(exc.detail))
+            current_locale = request.query_params.get("locale", DEFAULT_LOCALE)
+
+            return {"detail": tr.translate(exc.errors(), current_locale)}
 
 
 async def global_exception_handling(request, call_next):
@@ -53,6 +85,9 @@ async def global_exception_handling(request, call_next):
     try:
         return await call_next(request)
     except Exception as e:
+        logging.error(e)
+        logging.info(e)
+        logging.debug(e)
         return Http500(str(e)).get_response()
 
 

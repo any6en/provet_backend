@@ -84,7 +84,7 @@ class RepeatVisitTable(Base):
         return {
             'id': self.id,
             'doctor': self.user.last_name + " " + self.user.first_name[0] + ". " + self.user.patronymic[0] + ".",
-            'owner': self.owner.last_name + " " + self.owner.first_name + ". " + self.owner.patronymic,
+            'owner': self.owner.last_name + " " + self.owner.first_name + " " + self.owner.patronymic,
             'breed': self.patient.breed.name,
             'animal_type': self.patient.animal_type.name,
             'nickname': self.patient.nickname,

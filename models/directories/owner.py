@@ -17,9 +17,9 @@ class OwnerTable(Base):
     # Поспортные данные
     passport_series = Column(String(255), nullable=True)
     passport_number = Column(String(255), nullable=True)
-    issued_by = Column(String(255), nullable=True)
-    subdivision_code = Column(String(255), nullable=True)
-    issue_date = Column(Date, nullable=True)
+    passport_issued_by = Column(String(255), nullable=True)
+    passport_subdivision_code = Column(String(255), nullable=True)
+    passport_issue_date = Column(Date, nullable=True)
     pd_agreement_signed = Column(Boolean, nullable=False)
     date_pd_agreement_sign = Column(Date, nullable=True)
 
@@ -36,9 +36,9 @@ class OwnerTable(Base):
             'created_at': self.created_at.isoformat(),
             'passport_series': self.passport_series,
             'passport_number': self.passport_number,
-            'issued_by': self.issued_by,
-            'subdivision_code': self.subdivision_code ,
-            'issue_date': self.issue_date.isoformat() if self.issue_date else None,
+            'passport_issued_by': self.passport_issued_by,
+            'passport_subdivision_code': self.passport_subdivision_code ,
+            'passport_issue_date': self.passport_issue_date.isoformat() if self.passport_issue_date else None,
             'pd_agreement_signed': self.pd_agreement_signed,
             'date_pd_agreement_sign': self.date_pd_agreement_sign.isoformat()
                 if self.date_pd_agreement_sign else None

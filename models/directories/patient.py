@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from models.model import Base
 from utils.utils import calculate_age
@@ -10,10 +10,13 @@ class PatientTable(Base):
     __tablename__ = "patients"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    nickname = Column(String(255))
     animal_type_id = Column(Integer, ForeignKey('animal_types.id'), nullable=False)
     breed_id = Column(Integer, ForeignKey('breeds.id'), nullable=False)
     owner_id = Column(Integer, ForeignKey('owners.id'))
+    nickname = Column(String(25), nullable=False)
+    color = Column(String(50))
+    is_castrated = Column(Boolean, nullable=False)
+
     date_birth = Column(Date, nullable=False)
     gender = Column(Integer, nullable=False)
     created_at = Column(DateTime, nullable=False)
@@ -26,26 +29,30 @@ class PatientTable(Base):
     def to_dict(self):
         return {
             "id": self.id,
-            "nickname": self.nickname,
             "animal_type_id": self.animal_type_id,
             "breed_id": self.breed_id,
             "owner_id": self.owner_id,
-            "date_birth": self.date_birth,
+            "nickname": self.nickname,
+            "color": self.color,
+            "is_castrated": self.is_castrated,
+            "date_birth": self.date_birth.isoformat(),
             "gender": self.gender,
-            "created_at": self.created_at,
+            "created_at": self.created_at.isoformat(),
         }
 
     '''Метод для приведения объекта в словарь (используется для справочника)'''
     def to_dict_page(self):
         return {
             "id": self.id,
-            "nickname": self.nickname,
             "animal_type_id": self.animal_type_id,
             "breed_id": self.breed_id,
             "owner_id": self.owner_id,
-            "date_birth": self.date_birth,
+            "nickname": self.nickname,
+            "color": self.color,
+            "is_castrated": self.is_castrated,
+            "date_birth": self.date_birth.isoformat(),
             "gender": self.gender,
-            "created_at": self.created_at,
+            "created_at": self.created_at.isoformat(),
             "animal_type_name": self.animal_type.name,
             "breed_name": self.breed.name,
         }

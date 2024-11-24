@@ -1,5 +1,10 @@
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import ValidationError
+from starlette.responses import JSONResponse
+
+import tr
 
 from routers import ping
 from routers.directories import owner, animal_type, breed, patient, primary_visit, repeat_visit, user
@@ -30,10 +35,13 @@ app.include_router(document_generator.worker, prefix=f'/api', tags=["document_ge
 
 
 # Обработка HTTPException в контроллерах.
-app.exception_handler(StarletteHTTPException)(unicorn_exception_handler)
+#app.exception_handler(RequestValidationError)(unicorn_exception_handler)
+app.add_exception_handler(RequestValidationError, tr.validation_exception_handler)
+
 
 # Любое не отслеживаемое исключение - 500: Internal Server Error.
 app.middleware("http")(global_exception_handling)
+
 
 # Включение CORS
 app.add_middleware(
