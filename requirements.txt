@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+aiomysql
+docxtpl
+docx2pdf
+pydantic_i18n
