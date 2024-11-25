@@ -67,20 +67,5 @@ class PrimaryVisitUpdateAttributes(BaseModel):
     date_visit: Optional[datetime] = Field(None, description="Дата посещения (по умолчанию текущее время)")
     weight: Optional[Decimal] = Field(None, description="вес (тип DECIMAL(10, 2))")
 
-    @root_validator(pre=True)
-    def pre_validator(cls, values):
-        keys = values.keys()
-        if "id" not in keys or values.get("id") is None:
-            raise HTTPException(status_code=400, detail="Не указан идентификатор записи")
-
-        weight = values.get("weight")
-        if weight is not None:
-            if not isinstance(weight, (int, float)):
-                try:
-                    values["weight"] = float(weight)  # Пытаемся конвертировать в float
-                except (ValueError, TypeError):
-                    raise HTTPException(status_code=400, detail="Вес должен быть числом")
-        return values
-
     class Config:
         from_attributes = True

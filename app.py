@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import ValidationError
-from starlette.responses import JSONResponse
 
 import tr
 
@@ -12,8 +10,7 @@ from routers import auth
 from routers.med import journal
 from routers import document_generator
 
-from utils.utils import global_exception_handling, unicorn_exception_handler
-from starlette.exceptions import HTTPException as StarletteHTTPException
+from utils.utils import global_exception_handling
 
 
 app = FastAPI(title="Provet Backend Server")
