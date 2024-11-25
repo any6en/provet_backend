@@ -17,15 +17,5 @@ class User(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    login: str = Field(..., description="Логин пользователя", validate_default=True)
-    password: str = Field(..., description="Пароль пользователя", validate_default=True)
-
-    @root_validator(pre=True)
-    def validate_login_password(cls, values):
-        keys = values.keys()
-
-        if "login" not in keys or values.get("login") is None:
-            raise HTTPException(status_code=400, detail="Не указан логин")
-        if "password" not in keys or values.get("password") is None:
-            raise HTTPException(status_code=400, detail="Не указан пароль")
-        return values
+    login: str = Field(...)
+    password: str = Field(...)
