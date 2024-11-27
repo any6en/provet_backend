@@ -1,8 +1,8 @@
 from datetime import datetime
-
 from sqlalchemy import Column, Integer, Date, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from models.model import Base
+from utils.date_formatter import format_date_dmy_dt
 from utils.utils import calculate_age
 
 '''Модель таблицы первичных приемов в базе данных'''
@@ -26,6 +26,7 @@ class PrimaryVisitTable(Base):
     user = relationship("UserTable")
     owner = relationship("OwnerTable")
     patient = relationship("PatientTable")
+    examinations = relationship("VisitExaminationTable", back_populates="primary_visit")
 
     '''Метод для приведения объекта в словарь'''
     def to_dict(self):
@@ -72,7 +73,7 @@ class PrimaryVisitTable(Base):
             'anamnesis': self.anamnesis,
             'examination': self.examination,
             'result': self.result,
-            'date_visit': self.date_visit.isoformat() if self.date_visit else None,
+            'date_visit': format_date_dmy_dt(self.date_visit.isoformat(), is_month_translate=True),
             'weight': float(self.weight) if self.weight else None
         }
 

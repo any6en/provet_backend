@@ -6,17 +6,17 @@ from fastapi import HTTPException
 
 """Схема записи первичного приема, для INSERT(создания)"""
 class PrimaryVisitInsertAttributes(BaseModel):
-    user_id: int = Field(..., description="Идентификатор врача", gt=0)
-    owner_id: int = Field(..., description="Идентификатор владельца", gt=0)
-    patient_id: int = Field(..., description="Идентификатор пациента", gt=0)
-    disease_onset_date: datetime = Field(..., description="Дата возникновения болезни")
-    anamnesis: str = Field(..., description="Анамнез")
-    examination: str = Field(..., description="Обследование")
-    prelim_diagnosis: str = Field(..., description="Предварительный диагноз")
-    confirmed_diagnosis: str = Field(..., description="Подтвержденный диагноз")
-    result: str = Field(..., description="Результат")
-    date_visit: Optional[datetime] = Field(default_factory=datetime.now, description="Дата посещения (по умолчанию текущее время)")
-    weight: Optional[Decimal] = Field(None, description="вес (тип DECIMAL(10, 2))")
+    user_id: int = Field(...)
+    owner_id: int = Field(...)
+    patient_id: int = Field(...)
+    disease_onset_date: datetime = Field(...)
+    anamnesis: str = Field(...)
+    examination: str = Field(...)
+    prelim_diagnosis: str = Field(...)
+    confirmed_diagnosis: str = Field(None)
+    result: str = Field(...)
+    date_visit: Optional[datetime] = Field(default_factory=datetime.now)
+    weight: Optional[Decimal] = Field(None)
 
     @root_validator(pre=True)
     def validate_ids(cls, values):

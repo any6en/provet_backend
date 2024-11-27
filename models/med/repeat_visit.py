@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, Date, DateTime, Text, ForeignKey, DECIMAL
+from sqlalchemy import Column, Integer, Date, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from models.model import Base
+from utils.date_formatter import format_date_dmy_dt
 from utils.utils import calculate_age
 
 '''Модель таблицы повторный приемов в базе данных'''
@@ -40,7 +41,7 @@ class RepeatVisitTable(Base):
             'prelim_diagnosis': self.prelim_diagnosis,
             'confirmed_diagnosis': self.confirmed_diagnosis,
             'result': self.result,
-            'date_visit': self.date_visit.isoformat() if self.date_visit else None,
+            'date_visit': format_date_dmy_dt(self.date_visit.isoformat(), is_month_translate=True),
             'weight': float(self.weight) if self.weight else None
         }
 
@@ -76,7 +77,7 @@ class RepeatVisitTable(Base):
             'age': calculate_age(self.date_visit, self.patient.date_birth),
             'content': "Первичный прием",
             'owner_full_name': self.owner.last_name + " " + self.owner.first_name + " " + self.owner.patronymic,
-            'doctor_full_name': self.user.last_name + " " + self.user.first_name + " " + self.user.patronymic,
+            'doctor_full_name': self.user.last_name + " " + self.user.first_name + " " + self.user.patronymic
         }
 
     '''Метод для приведения объекта в словарь (используется при генерации листа повторного приема)'''
@@ -96,6 +97,6 @@ class RepeatVisitTable(Base):
             'anamnesis': self.anamnesis,
             'examination': self.examination,
             'result': self.result,
-            'date_visit': self.date_visit.isoformat() if self.date_visit else None,
+            'date_visit': format_date_dmy_dt(self.date_visit.isoformat(), is_month_translate=True),
             'weight': float(self.weight) if self.weight else None
         }
