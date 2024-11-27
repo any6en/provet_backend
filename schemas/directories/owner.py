@@ -1,9 +1,8 @@
 from typing import Optional
 
-from fastapi import HTTPException
 from pydantic import Field
 from datetime import datetime
-from pydantic import BaseModel, root_validator
+from pydantic import BaseModel
 
 from utils.date_formatter import format_date_dmy_dt
 
@@ -36,15 +35,15 @@ class OwnerUpdateAttributes(BaseModel):
     first_name: Optional[str] = Field(None, min_length=1, max_length=25)
     last_name: Optional[str] = Field(None, min_length=1, max_length=50)
     patronymic: Optional[str] = Field(None, min_length=1, max_length=50)
-    phone_number: Optional[int] = Field(..., ge=80000000000, le=89999999999)
+    phone_number: Optional[int] = Field(None, ge=80000000000, le=89999999999)
     address: Optional[str] = Field(None, min_length=1, max_length=255)
     date_birth: Optional[datetime] = Field(None)
     gender: Optional[int] = Field(None, ge=0, le=9)
 
-    passport_series: Optional[int] = Field(None, min_length=1, max_length=10)
-    passport_number: Optional[int] = Field(None, min_length=1, max_length=10)
+    passport_series: Optional[int] = Field(None, ge=1000, le=9999)
+    passport_number: Optional[int] = Field(None, ge=100000, le=999999)
     passport_issued_by: Optional[str] = Field(None, min_length=1, max_length=255)
-    passport_subdivision_code: Optional[int] = Field(None, min_length=1, max_length=10)
+    passport_subdivision_code: Optional[int] = Field(None, ge=100000, le=999999)
     passport_issue_date: Optional[datetime] = Field(None)
 
     pd_agreement_signed: bool = Field(None, description="Подписано ли СНоПД")
