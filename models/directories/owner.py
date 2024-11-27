@@ -32,7 +32,7 @@ class OwnerTable(Base):
             'last_name': self.last_name,
             'patronymic': self.patronymic,
             'address': self.address,
-            'address': self.phone_number if self.phone_number else None,
+            'phone_number': self.phone_number if self.phone_number else None,
             'date_birth': self.date_birth.isoformat() if self.date_birth else None,
             'gender': self.gender,
             'created_at': self.created_at.isoformat(),
