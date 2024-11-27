@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, Date, DateTime, Boolean, BigInteger
 from models.model import Base
 
 '''Модель таблицы владельцов в базе данных'''
@@ -10,7 +10,7 @@ class OwnerTable(Base):
     last_name = Column(String(255), nullable=False)
     patronymic = Column(String(255), nullable=False)
     address = Column(String(255))
-    phone_number = Column(Integer)
+    phone_number = Column(BigInteger)
     date_birth = Column(Date)
     gender = Column(Integer, nullable=False)
     created_at = Column(DateTime, nullable=False)
@@ -32,6 +32,7 @@ class OwnerTable(Base):
             'last_name': self.last_name,
             'patronymic': self.patronymic,
             'address': self.address,
+            'address': self.phone_number if self.phone_number else None,
             'date_birth': self.date_birth.isoformat() if self.date_birth else None,
             'gender': self.gender,
             'created_at': self.created_at.isoformat(),
