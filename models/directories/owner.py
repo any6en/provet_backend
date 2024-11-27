@@ -10,7 +10,7 @@ class OwnerTable(Base):
     last_name = Column(String(255), nullable=False)
     patronymic = Column(String(255), nullable=False)
     address = Column(String(255))
-    phone_number = Column(BigInteger)
+    phone_number = Column(String)
     date_birth = Column(Date)
     gender = Column(Integer, nullable=False)
     created_at = Column(DateTime, nullable=False)
