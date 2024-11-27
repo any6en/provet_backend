@@ -26,7 +26,6 @@ class PrimaryVisitTable(Base):
     user = relationship("UserTable")
     owner = relationship("OwnerTable")
     patient = relationship("PatientTable")
-    examinations = relationship("VisitExaminationTable", back_populates="primary_visit")
 
     '''Метод для приведения объекта в словарь'''
     def to_dict(self):
