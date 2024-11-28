@@ -78,8 +78,8 @@ class PatientTable(Base):
 
             "animal_type_name": self.animal_type.name,
             "breed_name": self.breed.name,
-            "color": "в скором времени добавим поле",
-            "castrated": "в скором времени добавим поле",
+            "color": self.color,
+            "is_castrated": self.is_castrated,
 
             "age": calculate_age(datetime.datetime.now(), self.date_birth),
             "date_birth": self.date_birth.isoformat() if self.date_birth else None,

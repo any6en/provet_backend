@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, Boolean, BigInteger
+from sqlalchemy import Column, Integer, String, Date, DateTime, Boolean
 from models.model import Base
 
 '''Модель таблицы владельцов в базе данных'''
