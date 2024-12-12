@@ -41,13 +41,22 @@ async def get_document_primary_visit(db: AsyncSession, primary_visit_id: int):
 
     primary_visit = primary_visit.to_dict_for_document()
 
+
+
+
     docx_path = f"resources/{primary_visit['nickname']}{primary_visit['id']}_первичный_прием.docx"
     pdf_path = f"resources/{primary_visit['nickname']}{primary_visit['id']}_первичный_прием.pdf"
 
-    # Создание DOCX документа
-    doc = DocxTemplate("resources/Назначение.docx")
-    doc.render(primary_visit)
-    doc.save(docx_path)
+    if primary_visit['prelim_diagnosis'] == None and primary_visit['confirmed_diagnosis'] == None:
+        # Создание DOCX документа
+        doc = DocxTemplate("resources/Назначение_без_диагнозов.docx")
+        doc.render(primary_visit)
+        doc.save(docx_path)
+    else:
+        # Создание DOCX документа
+        doc = DocxTemplate("resources/Назначение.docx")
+        doc.render(primary_visit)
+        doc.save(docx_path)
 
     # Конвертация DOCX в PDF
     convert_to_pdf(docx_path, os.path.dirname(pdf_path))

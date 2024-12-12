@@ -13,11 +13,11 @@ class PrimaryVisitTable(Base):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     owner_id = Column(Integer, ForeignKey('owners.id'), nullable=False)
     patient_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
-    disease_onset_date = Column(Date, nullable=False)
+    disease_onset_date = Column(Date, nullable=True)
     anamnesis = Column(Text, nullable=False)
     examination = Column(Text, nullable=False)
-    prelim_diagnosis = Column(Text, nullable=False)
-    confirmed_diagnosis = Column(Text, nullable=False)
+    prelim_diagnosis = Column(Text, nullable=True)
+    confirmed_diagnosis = Column(Text, nullable=True)
     result = Column(Text, nullable=False)
     date_visit = Column(DateTime, nullable=False)
     weight = Column(Integer, nullable=True)
@@ -68,7 +68,7 @@ class PrimaryVisitTable(Base):
             'gender': "Самец" if self.patient.gender == 1 else "Самка" if self.patient.gender == 2 else "Не указано",
             'prelim_diagnosis': self.prelim_diagnosis,
             'confirmed_diagnosis': self.confirmed_diagnosis,
-            'disease_onset_date': self.disease_onset_date,
+            'disease_onset_date': self.disease_onset_date if self.disease_onset_date else None,
             'anamnesis': self.anamnesis,
             'examination': self.examination,
             'result': self.result,
@@ -92,7 +92,7 @@ class PrimaryVisitTable(Base):
             'confirmed_diagnosis': self.confirmed_diagnosis,
             'result': self.result,
             'weight': float(self.weight) if self.weight else None,
-            'disease_onset_date': self.disease_onset_date.isoformat(),
+            'disease_onset_date': self.disease_onset_date.isoformat() if self.disease_onset_date else None,
             'breed_name': self.patient.breed.name,
             'breed_id': self.patient.breed.id,
             'date_birth': self.patient.date_birth.isoformat(),
